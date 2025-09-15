@@ -1,4 +1,4 @@
-# Quick Start Guide - SecureQR Scanner
+# Quick Start Guide - OkiQr
 
 ## 🚀 Get Started in 5 Minutes
 
@@ -80,4 +80,4 @@ npx expo run:android
 
 ## 🎯 Ready to Use!
 
-Your SecureQR Scanner is now ready to protect you from malicious QR codes!
+Your OkiQr is now ready to protect you from malicious QR codes!

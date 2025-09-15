@@ -70,7 +70,7 @@ export default function App() {
               name="Scanner"
               component={ScannerScreen}
               options={({ navigation }) => ({
-                title: "SecureQR Scanner",
+                title: "OkiQr",
                 headerRight: () => (
                   <TouchableOpacity
                     style={{ marginRight: 15 }}

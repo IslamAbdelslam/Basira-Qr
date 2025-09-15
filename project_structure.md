@@ -1,4 +1,4 @@
-# SecureQR Scanner - Complete Project Setup Guide
+# OkiQr - Complete Project Setup Guide
 
 ## 🗂️ Project Structure
 
@@ -225,7 +225,7 @@ Create this as a shell script to automate setup:
 
 ```bash
 #!/bin/bash
-echo "Setting up SecureQR Scanner..."
+echo "Setting up OkiQr..."
 
 # Create project
 npx create-expo-app SecureQRScanner --template blank

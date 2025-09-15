@@ -1,5 +1,5 @@
 # AI Development Instructions
-## SecureQR Scanner Implementation Guide
+## OkiQr Implementation Guide
 
 ### 1. Development Environment Setup
 

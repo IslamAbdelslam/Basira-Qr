@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,52 +9,53 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useApp } from '../contexts/AppContext';
-import StorageService from '../services/StorageService';
-import VirusTotalService from '../services/VirusTotalService';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useApp } from "../contexts/AppContext";
+import StorageService from "../services/StorageService";
+import VirusTotalService from "../services/VirusTotalService";
 
 const SettingsScreen = ({ navigation }) => {
   const { state, actions } = useApp();
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [newApiKey, setNewApiKey] = useState('');
+  const [newApiKey, setNewApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
-  const [maskedApiKey, setMaskedApiKey] = useState('');
+  const [maskedApiKey, setMaskedApiKey] = useState("");
 
   useEffect(() => {
     if (state.apiKey) {
       // Mask the API key for display
       const key = state.apiKey;
-      const masked = key.length > 8 
-        ? key.substring(0, 4) + '...' + key.substring(key.length - 4)
-        : '****';
+      const masked =
+        key.length > 8
+          ? key.substring(0, 4) + "..." + key.substring(key.length - 4)
+          : "****";
       setMaskedApiKey(masked);
     }
   }, [state.apiKey]);
 
   const handleChangeApiKey = async () => {
     if (!newApiKey.trim()) {
-      Alert.alert('Error', 'Please enter a valid API key');
+      Alert.alert("Error", "Please enter a valid API key");
       return;
     }
 
     setIsValidating(true);
-    
+
     try {
       const vtService = new VirusTotalService();
       const isValid = await vtService.validateApiKey(newApiKey.trim());
-      
+
       if (isValid) {
         await actions.setApiKey(newApiKey.trim());
         setShowApiKeyModal(false);
-        setNewApiKey('');
-        Alert.alert('Success', 'API key updated successfully!');
+        setNewApiKey("");
+        Alert.alert("Success", "API key updated successfully!");
       } else {
-        Alert.alert('Invalid API Key', 'The API key you entered is not valid.');
+        Alert.alert("Invalid API Key", "The API key you entered is not valid.");
       }
     } catch (error) {
-      Alert.alert('Validation Failed', 'Failed to validate the new API key.');
+      Alert.alert("Validation Failed", "Failed to validate the new API key.");
     } finally {
       setIsValidating(false);
     }
@@ -62,23 +63,23 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleRemoveApiKey = () => {
     Alert.alert(
-      'Remove API Key',
-      'Are you sure you want to remove your API key? You will need to set it up again to use the app.',
+      "Remove API Key",
+      "Are you sure you want to remove your API key? You will need to set it up again to use the app.",
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Cancel", style: "cancel" },
         {
-          text: 'Remove',
-          style: 'destructive',
+          text: "Remove",
+          style: "destructive",
           onPress: async () => {
             try {
               await StorageService.removeApiKey();
               Alert.alert(
-                'API Key Removed',
-                'You will be redirected to the setup screen.',
-                [{ text: 'OK', onPress: () => navigation.replace('Setup') }]
+                "API Key Removed",
+                "You will be redirected to the setup screen.",
+                [{ text: "OK", onPress: () => navigation.replace("Setup") }]
               );
             } catch (error) {
-              Alert.alert('Error', 'Failed to remove API key');
+              Alert.alert("Error", "Failed to remove API key");
             }
           },
         },
@@ -88,23 +89,29 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleClearHistory = () => {
     Alert.alert(
-      'Clear Scan History',
-      'Are you sure you want to clear all scan history?',
+      "Clear Scan History",
+      "Are you sure you want to clear all scan history?",
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Cancel", style: "cancel" },
         {
-          text: 'Clear',
-          style: 'destructive',
+          text: "Clear",
+          style: "destructive",
           onPress: () => {
             // This would require implementing a clear history action in the context
-            Alert.alert('Success', 'Scan history cleared');
+            Alert.alert("Success", "Scan history cleared");
           },
         },
       ]
     );
   };
 
-  const SettingItem = ({ title, subtitle, onPress, rightElement, danger = false }) => (
+  const SettingItem = ({
+    title,
+    subtitle,
+    onPress,
+    rightElement,
+    danger = false,
+  }) => (
     <TouchableOpacity
       style={styles.settingItem}
       onPress={onPress}
@@ -114,15 +121,9 @@ const SettingsScreen = ({ navigation }) => {
         <Text style={[styles.settingTitle, danger && styles.dangerText]}>
           {title}
         </Text>
-        {subtitle && (
-          <Text style={styles.settingSubtitle}>{subtitle}</Text>
-        )}
+        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
-      {rightElement && (
-        <View style={styles.settingRight}>
-          {rightElement}
-        </View>
-      )}
+      {rightElement && <View style={styles.settingRight}>{rightElement}</View>}
     </TouchableOpacity>
   );
 
@@ -133,17 +134,17 @@ const SettingsScreen = ({ navigation }) => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Settings</Text>
           <Text style={styles.headerSubtitle}>
-            Manage your SecureQR Scanner preferences
+            Manage your OkiQr preferences
           </Text>
         </View>
 
         {/* API Key Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🔑 VirusTotal Integration</Text>
-          
+
           <SettingItem
             title="API Key"
-            subtitle={`Current: ${maskedApiKey || 'Not set'}`}
+            subtitle={`Current: ${maskedApiKey || "Not set"}`}
             onPress={() => setShowApiKeyModal(true)}
             rightElement={<Text style={styles.editText}>Edit</Text>}
           />
@@ -159,7 +160,7 @@ const SettingsScreen = ({ navigation }) => {
         {/* Scan History Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📊 Scan History</Text>
-          
+
           <SettingItem
             title="Total Scans"
             subtitle={`${state.scanHistory.length} QR codes scanned`}
@@ -179,40 +180,33 @@ const SettingsScreen = ({ navigation }) => {
         {/* Security Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🛡️ Security Settings</Text>
-          
+
           <SettingItem
             title="HTTPS Warning"
             subtitle="Always warn about HTTP (non-secure) links"
-            rightElement={
-              <Text style={styles.statusText}>Enabled</Text>
-            }
+            rightElement={<Text style={styles.statusText}>Enabled</Text>}
           />
 
           <SettingItem
             title="Auto-block Malicious"
             subtitle="Prevent opening URLs flagged as malicious"
-            rightElement={
-              <Text style={styles.statusText}>Enabled</Text>
-            }
+            rightElement={<Text style={styles.statusText}>Enabled</Text>}
           />
         </View>
 
         {/* App Info Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>ℹ️ App Information</Text>
-          
-          <SettingItem
-            title="Version"
-            subtitle="SecureQR Scanner v1.0.0"
-          />
+
+          <SettingItem title="Version" subtitle="OkiQr v1.0.0" />
 
           <SettingItem
             title="Privacy Policy"
             subtitle="View our privacy practices"
             onPress={() => {
               Alert.alert(
-                'Privacy Policy',
-                'SecureQR Scanner:\n\n• Stores your API key securely on device\n• Sends scanned URLs to VirusTotal for analysis\n• Does not collect personal data\n• Scan history stays on your device'
+                "Privacy Policy",
+                "OkiQr:\n\n• Stores your API key securely on device\n• Sends scanned URLs to VirusTotal for analysis\n• Does not collect personal data\n• Scan history stays on your device"
               );
             }}
             rightElement={<Text style={styles.editText}>View</Text>}
@@ -223,8 +217,8 @@ const SettingsScreen = ({ navigation }) => {
             subtitle="Learn about our security partner"
             onPress={() => {
               Alert.alert(
-                'About VirusTotal',
-                'VirusTotal is a free online service that analyzes URLs and files for malicious content using multiple antivirus engines and security tools.'
+                "About VirusTotal",
+                "VirusTotal is a free online service that analyzes URLs and files for malicious content using multiple antivirus engines and security tools."
               );
             }}
             rightElement={<Text style={styles.editText}>Info</Text>}
@@ -249,7 +243,7 @@ const SettingsScreen = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 setShowApiKeyModal(false);
-                setNewApiKey('');
+                setNewApiKey("");
               }}
             >
               <Text style={styles.cancelButton}>Cancel</Text>
@@ -259,18 +253,22 @@ const SettingsScreen = ({ navigation }) => {
               onPress={handleChangeApiKey}
               disabled={!newApiKey.trim() || isValidating}
             >
-              <Text style={[
-                styles.saveButton,
-                (!newApiKey.trim() || isValidating) && styles.saveButtonDisabled
-              ]}>
-                {isValidating ? 'Validating...' : 'Save'}
+              <Text
+                style={[
+                  styles.saveButton,
+                  (!newApiKey.trim() || isValidating) &&
+                    styles.saveButtonDisabled,
+                ]}
+              >
+                {isValidating ? "Validating..." : "Save"}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.modalContent}>
             <Text style={styles.modalDescription}>
-              Enter your new VirusTotal API key. The key will be validated before saving.
+              Enter your new VirusTotal API key. The key will be validated
+              before saving.
             </Text>
 
             <TextInput
@@ -286,9 +284,7 @@ const SettingsScreen = ({ navigation }) => {
             {isValidating && (
               <View style={styles.validatingContainer}>
                 <ActivityIndicator size="small" color="#2196F3" />
-                <Text style={styles.validatingText}>
-                  Validating API key...
-                </Text>
+                <Text style={styles.validatingText}>Validating API key...</Text>
               </View>
             )}
 
@@ -297,8 +293,8 @@ const SettingsScreen = ({ navigation }) => {
               onPress={() => {
                 // This would open the VirusTotal signup page
                 Alert.alert(
-                  'Get API Key',
-                  'Visit virustotal.com to create a free account and get your API key.'
+                  "Get API Key",
+                  "Visit virustotal.com to create a free account and get your API key."
                 );
               }}
             >
@@ -316,122 +312,122 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flex: 1,
   },
   header: {
     padding: 20,
-    backgroundColor: '#2196F3',
-    alignItems: 'center',
+    backgroundColor: "#2196F3",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 5,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: "#fff",
     opacity: 0.9,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginTop: 15,
     paddingVertical: 10,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   settingContent: {
     flex: 1,
   },
   settingTitle: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   settingRight: {
     marginLeft: 10,
   },
   editText: {
-    color: '#2196F3',
+    color: "#2196F3",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   countText: {
-    color: '#666',
+    color: "#666",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statusText: {
-    color: '#4CAF50',
+    color: "#4CAF50",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   dangerText: {
-    color: '#F44336',
+    color: "#F44336",
   },
   footer: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   footerText: {
-    color: '#666',
+    color: "#666",
     fontSize: 14,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   cancelButton: {
-    color: '#666',
+    color: "#666",
     fontSize: 16,
   },
   saveButton: {
-    color: '#2196F3',
+    color: "#2196F3",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   saveButtonDisabled: {
-    color: '#ccc',
+    color: "#ccc",
   },
   modalContent: {
     flex: 1,
@@ -439,43 +435,43 @@ const styles = StyleSheet.create({
   },
   modalDescription: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 20,
     lineHeight: 24,
   },
   apiKeyInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 15,
     fontSize: 16,
     minHeight: 100,
     maxHeight: 150,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     marginBottom: 20,
   },
   validatingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
   },
   validatingText: {
     marginLeft: 10,
-    color: '#666',
+    color: "#666",
     fontSize: 16,
   },
   getKeyButton: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   getKeyButtonText: {
-    color: '#2196F3',
+    color: "#2196F3",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
 

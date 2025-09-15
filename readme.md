@@ -1,4 +1,4 @@
-# SecureQR Scanner
+# OkiQr
 
 A secure QR code scanner that protects users from malicious links using VirusTotal API. This app acts as a guardian between users and potentially dangerous QR codes by scanning URLs through VirusTotal's security analysis before allowing access.
 
@@ -146,7 +146,7 @@ VirusTotal free tier includes:
 ### Common Issues
 
 1. **Camera Permission Denied**
-   - Go to Android Settings → Apps → SecureQR Scanner → Permissions
+   - Go to Android Settings → Apps → OkiQr → Permissions
    - Enable Camera permission
 
 2. **API Key Invalid**

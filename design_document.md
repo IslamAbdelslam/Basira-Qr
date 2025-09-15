@@ -1,5 +1,5 @@
 # Design Document
-## SecureQR Scanner - Architecture & Implementation
+## OkiQr - Architecture & Implementation
 
 ### 1. System Architecture
 
