@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "SecureQR Scanner",
+    "slug": "secureqr-scanner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2196F3"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "SecureQR Scanner needs camera access to scan QR codes for security analysis."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2196F3"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.secureqr.scanner",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow SecureQR Scanner to access your camera to scan QR codes for security analysis."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "78de9798-c5d3-4058-ba86-d458ad46737d"
+      }
+    },
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "owner": "islam_abdoul"
+  }
+}
