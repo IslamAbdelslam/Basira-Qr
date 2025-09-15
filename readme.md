@@ -44,47 +44,63 @@ A secure QR code scanner that protects users from malicious links using VirusTot
    ```bash
    npm start
    ```
+## 🚀 Running the Project
 
-4. **Run on Android device/emulator**
+After setting up all files:
+
+```bash
+# Start the development server
+expo start
+
+# Run on Android
+expo start --android
+
+# Run on iOS (if you have Mac)
+expo start --ios
+```
+
+## 🐛 Common Setup Issues & Fixes
+
+1. **Metro bundler issues:**
    ```bash
-   npm run android
+   expo start -c  # Clear cache
    ```
 
-## Building APK
-
-### Using EAS Build (Recommended)
-
-1. **Install EAS CLI**
+2. **Dependency conflicts:**
    ```bash
-   npm install -g @expo/eas-cli
+   rm -rf node_modules
+   npm install
    ```
 
-2. **Login to Expo**
-   ```bash
-   eas login
-   ```
+3. **Missing permissions in app.json:**
+   Make sure camera permissions are properly configured.
 
-3. **Configure project**
+4. **Import errors:**
+   Double-check all file paths match the structure above.
+
+## 📝 Final Steps
+
+1. **Get VirusTotal API Key:**
+   - Go to [virustotal.com/gui/join-us](https://www.virustotal.com/gui/join-us)
+   - Register for free account
+   - Get your API key from profile settings
+
+2. **Test the App:**
+   - Install on Android device/emulator
+   - Complete setup with your API key
+   - Test QR code scanning functionality
+
+3. **Build for Production:**
    ```bash
+   # Install EAS CLI
+   npm install -g @expo/cli
+   
+   # Configure build
    eas build:configure
+   
+   # Build APK
+   eas build --platform android --profile preview
    ```
-
-4. **Build APK**
-   ```bash
-   npm run build:apk
-   ```
-
-### Local Build (Advanced)
-
-1. **Generate development build**
-   ```bash
-   npx expo run:android
-   ```
-
-2. **Create APK manually**
-   - Open Android Studio
-   - Import the android folder
-   - Build → Generate Signed Bundle/APK
 
 ## Configuration
 
@@ -94,37 +110,6 @@ A secure QR code scanner that protects users from malicious links using VirusTot
 2. Create a free account
 3. Go to your profile and copy your API key
 4. Enter the API key in the app during first launch
-
-### App Configuration
-
-The app is configured in `app.json`:
-- Package name: `com.secureqr.scanner`
-- Version: 1.0.0
-- Permissions: Camera, Internet, Network State
-
-## Project Structure
-
-```
-SecureQRScanner/
-├── src/
-│   ├── components/          # Reusable UI components
-│   ├── contexts/           # React Context for state management
-│   ├── screens/            # App screens
-│   │   ├── SetupScreen.js     # API key setup
-│   │   ├── ScannerScreen.js   # QR code scanner
-│   │   ├── ResultsScreen.js   # Security results
-│   │   └── SettingsScreen.js  # App settings
-│   ├── services/           # Business logic services
-│   │   ├── VirusTotalService.js  # VirusTotal API integration
-│   │   ├── UrlValidator.js       # URL validation utilities
-│   │   └── StorageService.js     # Secure storage management
-│   └── utils/              # Helper utilities
-├── assets/                 # App icons and images
-├── App.js                  # Main app component
-├── app.json               # Expo configuration
-├── eas.json               # EAS build configuration
-└── package.json           # Dependencies and scripts
-```
 
 ## Security Features
 
