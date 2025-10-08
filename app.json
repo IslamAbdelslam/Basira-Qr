@@ -12,7 +12,8 @@
       "backgroundColor": "#2196F3"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/**/*",
+      "src/i18n/**/*"
     ],
     "ios": {
       "supportsTablet": true,
@@ -60,7 +61,9 @@
     {
       "android": {
         "enableProguardInReleaseBuilds": true,
-        "enableShrinkResourcesInReleaseBuilds": true
+        "enableShrinkResourcesInReleaseBuilds": true,
+        "enableSeparateBuildPerCPUArchitecture": true,
+        "enableDexingArtifactTransform": true
       }
     }
   ]
