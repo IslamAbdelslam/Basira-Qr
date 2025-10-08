@@ -1,3 +1,4 @@
+// src/screens/SettingsScreen.js - Complete Updated Version
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -19,20 +20,28 @@ import { useLocale } from "../contexts/LocaleContext";
 import { useThemeMode } from "../contexts/ThemeContext";
 import StorageService from "../services/StorageService";
 import VirusTotalService from "../services/VirusTotalService";
+import Toast from "../components/Toast";
 
 const SettingsScreen = ({ navigation }) => {
   const { state, actions } = useApp();
   const { t, locale, changeLocale } = useLocale();
-  const { theme, mode, setMode, colorScheme, setColorScheme, availableSchemes } = useThemeMode();
-  
+  const {
+    theme,
+    mode,
+    setMode,
+    colorScheme,
+    setColorScheme,
+    availableSchemes,
+  } = useThemeMode();
+
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [newApiKey, setNewApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [maskedApiKey, setMaskedApiKey] = useState("");
+  const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
     if (state.apiKey) {
-      // Mask the API key for display
       const key = state.apiKey;
       const masked =
         key.length > 8
@@ -42,9 +51,17 @@ const SettingsScreen = ({ navigation }) => {
     }
   }, [state.apiKey]);
 
+  const showToast = (message, type = "info") => {
+    setToastMessage({ message, type });
+  };
+
+  const hideToast = () => {
+    setToastMessage(null);
+  };
+
   const handleChangeApiKey = async () => {
     if (!newApiKey.trim()) {
-      Alert.alert(t('errors.error'), t('errors.enterValidKey'));
+      Alert.alert(t("errors.error"), t("errors.enterValidKey"));
       return;
     }
 
@@ -58,12 +75,18 @@ const SettingsScreen = ({ navigation }) => {
         await actions.setApiKey(newApiKey.trim());
         setShowApiKeyModal(false);
         setNewApiKey("");
-        Alert.alert(t('errors.success'), t('errors.apiKeyUpdated'));
+        Alert.alert(t("errors.success"), t("errors.apiKeyUpdated"));
       } else {
-        Alert.alert(t('errors.invalidApiKey'), t('errors.invalidApiKeyMessage'));
+        Alert.alert(
+          t("errors.invalidApiKey"),
+          t("errors.invalidApiKeyMessage")
+        );
       }
     } catch (error) {
-      Alert.alert(t('errors.validationFailed'), t('errors.validationFailedMessage'));
+      Alert.alert(
+        t("errors.validationFailed"),
+        t("errors.validationFailedMessage")
+      );
     } finally {
       setIsValidating(false);
     }
@@ -71,23 +94,28 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleRemoveApiKey = () => {
     Alert.alert(
-      t('errors.removeApiKeyTitle'),
-      t('errors.removeApiKeyMessage'),
+      t("errors.removeApiKeyTitle"),
+      t("errors.removeApiKeyMessage"),
       [
-        { text: t('common.cancel'), style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: t('settings.removeKey'),
+          text: t("settings.removeKey"),
           style: "destructive",
           onPress: async () => {
             try {
               await StorageService.removeApiKey();
               Alert.alert(
-                t('errors.apiKeyRemoved'),
-                t('errors.apiKeyRemovedMessage'),
-                [{ text: t('common.ok'), onPress: () => navigation.replace("Setup") }]
+                t("errors.apiKeyRemoved"),
+                t("errors.apiKeyRemovedMessage"),
+                [
+                  {
+                    text: t("common.ok"),
+                    onPress: () => navigation.replace("Setup"),
+                  },
+                ]
               );
             } catch (error) {
-              Alert.alert(t('errors.error'), t('errors.failedToRemove'));
+              Alert.alert(t("errors.error"), t("errors.failedToRemove"));
             }
           },
         },
@@ -97,15 +125,15 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleClearHistory = () => {
     Alert.alert(
-      t('errors.clearHistoryTitle'),
-      t('errors.clearHistoryMessage'),
+      t("errors.clearHistoryTitle"),
+      t("errors.clearHistoryMessage"),
       [
-        { text: t('common.cancel'), style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: t('settings.clearHistory'),
+          text: t("settings.clearHistory"),
           style: "destructive",
           onPress: () => {
-            Alert.alert(t('errors.success'), t('errors.successMessage'));
+            Alert.alert(t("errors.success"), t("errors.successMessage"));
           },
         },
       ]
@@ -125,14 +153,21 @@ const SettingsScreen = ({ navigation }) => {
       disabled={!onPress}
     >
       <View style={styles.settingContent}>
-        <Text style={[
-          styles.settingTitle,
-          { color: danger ? theme.colors.danger : theme.colors.text }
-        ]}>
+        <Text
+          style={[
+            styles.settingTitle,
+            { color: danger ? theme.colors.danger : theme.colors.text },
+          ]}
+        >
           {title}
         </Text>
         {subtitle && (
-          <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+          <Text
+            style={[
+              styles.settingSubtitle,
+              { color: theme.colors.textSecondary },
+            ]}
+          >
             {subtitle}
           </Text>
         )}
@@ -142,116 +177,158 @@ const SettingsScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView style={styles.scrollView}>
         {/* Header */}
-        <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
-          <Text style={styles.headerTitle}>{t('settings.title')}</Text>
-          <Text style={styles.headerSubtitle}>
-            {t('settings.subtitle')}
-          </Text>
+        <View
+          style={[styles.header, { backgroundColor: theme.colors.primary }]}
+        >
+          <Text style={styles.headerTitle}>{t("settings.title")}</Text>
+          <Text style={styles.headerSubtitle}>{t("settings.subtitle")}</Text>
         </View>
 
         {/* Appearance Section */}
         <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
-            {t('settings.appearance')}
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {t("settings.appearance")}
           </Text>
 
           {/* Language Selector */}
-          <View style={[styles.settingItem, { borderBottomColor: theme.colors.divider }]}>
+          <View
+            style={[
+              styles.settingItem,
+              { borderBottomColor: theme.colors.divider },
+            ]}
+          >
             <View style={styles.settingContent}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
-                {t('settings.language')}
+                {t("settings.language")}
               </Text>
-              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
-                {t('settings.languageSubtitle')}
+              <Text
+                style={[
+                  styles.settingSubtitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("settings.languageSubtitle")}
               </Text>
             </View>
             <View style={styles.languageSelector}>
               <TouchableOpacity
                 style={[
                   styles.languageButton,
-                  locale === 'en' && { backgroundColor: theme.colors.primary },
-                  { borderColor: theme.colors.border }
+                  locale === "en" && { backgroundColor: theme.colors.primary },
+                  { borderColor: theme.colors.border },
                 ]}
-                onPress={() => changeLocale('en')}
+                onPress={() => changeLocale("en")}
               >
-                <Text style={[
-                  styles.languageButtonText,
-                  { color: locale === 'en' ? '#fff' : theme.colors.text }
-                ]}>
-                  {t('settings.english')}
+                <Text
+                  style={[
+                    styles.languageButtonText,
+                    { color: locale === "en" ? "#fff" : theme.colors.text },
+                  ]}
+                >
+                  {t("settings.english")}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.languageButton,
-                  locale === 'ar' && { backgroundColor: theme.colors.primary },
-                  { borderColor: theme.colors.border }
+                  locale === "ar" && { backgroundColor: theme.colors.primary },
+                  { borderColor: theme.colors.border },
                 ]}
-                onPress={() => changeLocale('ar')}
+                onPress={() => changeLocale("ar")}
               >
-                <Text style={[
-                  styles.languageButtonText,
-                  { color: locale === 'ar' ? '#fff' : theme.colors.text }
-                ]}>
-                  {t('settings.arabic')}
+                <Text
+                  style={[
+                    styles.languageButtonText,
+                    { color: locale === "ar" ? "#fff" : theme.colors.text },
+                  ]}
+                >
+                  {t("settings.arabic")}
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Dark Mode Selector */}
-          <View style={[styles.settingItem, { borderBottomColor: theme.colors.divider }]}>
+          <View
+            style={[
+              styles.settingItem,
+              { borderBottomColor: theme.colors.divider },
+            ]}
+          >
             <View style={styles.settingContent}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
-                {t('settings.darkMode')}
+                {t("settings.darkMode")}
               </Text>
-              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
-                {t('settings.darkModeSubtitle')}
+              <Text
+                style={[
+                  styles.settingSubtitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("settings.darkModeSubtitle")}
               </Text>
             </View>
             <View style={styles.themeSelector}>
               <TouchableOpacity
                 style={[
                   styles.themeButton,
-                  mode === 'light' && { backgroundColor: theme.colors.primary },
+                  mode === "light" && { backgroundColor: theme.colors.primary },
                 ]}
-                onPress={() => setMode('light')}
+                onPress={() => setMode("light")}
               >
-                <Text style={[
-                  styles.themeButtonText,
-                  { color: mode === 'light' ? '#fff' : theme.colors.text }
-                ]}>
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: mode === "light" ? "#fff" : theme.colors.text },
+                  ]}
+                >
                   ☀️
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.themeButton,
-                  mode === 'system' && { backgroundColor: theme.colors.primary },
+                  mode === "system" && {
+                    backgroundColor: theme.colors.primary,
+                  },
                 ]}
-                onPress={() => setMode('system')}
+                onPress={() => setMode("system")}
               >
-                <Text style={[
-                  styles.themeButtonText,
-                  { color: mode === 'system' ? '#fff' : theme.colors.text }
-                ]}>
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: mode === "system" ? "#fff" : theme.colors.text },
+                  ]}
+                >
                   ⚙️
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.themeButton,
-                  mode === 'dark' && { backgroundColor: theme.colors.primary },
+                  mode === "dark" && { backgroundColor: theme.colors.primary },
                 ]}
-                onPress={() => setMode('dark')}
+                onPress={() => setMode("dark")}
               >
-                <Text style={[
-                  styles.themeButtonText,
-                  { color: mode === 'dark' ? '#fff' : theme.colors.text }
-                ]}>
+                <Text
+                  style={[
+                    styles.themeButtonText,
+                    { color: mode === "dark" ? "#fff" : theme.colors.text },
+                  ]}
+                >
                   🌙
                 </Text>
               </TouchableOpacity>
@@ -264,22 +341,32 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
                 Color Scheme
               </Text>
-              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.settingSubtitle,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
                 Choose your preferred color
               </Text>
             </View>
           </View>
-          <View style={[styles.colorSchemeGrid, { paddingHorizontal: 20, paddingBottom: 15 }]}>
+          <View
+            style={[
+              styles.colorSchemeGrid,
+              { paddingHorizontal: 20, paddingBottom: 15 },
+            ]}
+          >
             {availableSchemes.map((scheme) => {
               const schemeColors = {
-                indigo: '#6366F1',
-                teal: '#14B8A6',
-                orange: '#F97316',
-                purple: '#A855F7',
-                blue: '#2196F3',
-                green: '#10B981',
+                indigo: "#6366F1",
+                teal: "#14B8A6",
+                orange: "#F97316",
+                purple: "#A855F7",
+                blue: "#2196F3",
+                green: "#10B981",
               };
-              
+
               return (
                 <TouchableOpacity
                   key={scheme}
@@ -304,20 +391,34 @@ const SettingsScreen = ({ navigation }) => {
 
         {/* API Key Section */}
         <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
-            {t('settings.vtIntegration')}
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {t("settings.vtIntegration")}
           </Text>
 
           <SettingItem
-            title={t('settings.apiKey')}
-            subtitle={t('settings.currentKey', { key: maskedApiKey || t('settings.notSet') })}
+            title={t("settings.apiKey")}
+            subtitle={t("settings.currentKey", {
+              key: maskedApiKey || t("settings.notSet"),
+            })}
             onPress={() => setShowApiKeyModal(true)}
-            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.edit')}</Text>}
+            rightElement={
+              <Text style={[styles.editText, { color: theme.colors.primary }]}>
+                {t("common.edit")}
+              </Text>
+            }
           />
 
           <SettingItem
-            title={t('settings.removeKey')}
-            subtitle={t('settings.removeKeySubtitle')}
+            title={t("settings.removeKey")}
+            subtitle={t("settings.removeKeySubtitle")}
             onPress={handleRemoveApiKey}
             danger={true}
           />
@@ -325,23 +426,38 @@ const SettingsScreen = ({ navigation }) => {
 
         {/* Scan History Section */}
         <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
-            {t('settings.scanHistory')}
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {t("settings.scanHistory")}
           </Text>
 
           <SettingItem
-            title={t('settings.totalScans')}
-            subtitle={t('settings.scansCount', { count: state.scanHistory.length })}
+            title={t("settings.totalScans")}
+            subtitle={t("settings.scansCount", {
+              count: state.scanHistory.length,
+            })}
             rightElement={
-              <Text style={[styles.countText, { color: theme.colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.countText,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
                 {state.scanHistory.length}
               </Text>
             }
           />
 
           <SettingItem
-            title={t('settings.clearHistory')}
-            subtitle={t('settings.clearHistorySubtitle')}
+            title={t("settings.clearHistory")}
+            subtitle={t("settings.clearHistorySubtitle")}
             onPress={handleClearHistory}
             danger={true}
           />
@@ -349,33 +465,63 @@ const SettingsScreen = ({ navigation }) => {
 
         {/* Security Settings */}
         <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
-            {t('settings.securitySettings')}
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {t("settings.securitySettings")}
           </Text>
 
           <SettingItem
-            title={t('settings.httpsWarning')}
-            subtitle={t('settings.httpsWarningSubtitle')}
+            title={t("settings.httpsWarning")}
+            subtitle={t("settings.httpsWarningSubtitle")}
             rightElement={
               <Switch
                 value={state.settings.httpsWarning}
-                onValueChange={(value) => actions.updateSettings({ httpsWarning: value })}
-                trackColor={{ false: theme.colors.disabled, true: theme.colors.success }}
-                thumbColor={state.settings.httpsWarning ? '#fff' : '#f4f3f4'}
+                onValueChange={(value) => {
+                  actions.updateSettings({ httpsWarning: value });
+                  showToast(
+                    value
+                      ? t("settings.httpsWarningEnabled")
+                      : t("settings.httpsWarningDisabled"),
+                    "info"
+                  );
+                }}
+                trackColor={{
+                  false: theme.colors.disabled,
+                  true: theme.colors.success,
+                }}
+                thumbColor={state.settings.httpsWarning ? "#fff" : "#f4f3f4"}
                 ios_backgroundColor={theme.colors.disabled}
               />
             }
           />
 
           <SettingItem
-            title={t('settings.autoBlock')}
-            subtitle={t('settings.autoBlockSubtitle')}
+            title={t("settings.urlScanning")}
+            subtitle={t("settings.urlScanningSubtitle")}
             rightElement={
               <Switch
-                value={state.settings.autoBlockMalicious}
-                onValueChange={(value) => actions.updateSettings({ autoBlockMalicious: value })}
-                trackColor={{ false: theme.colors.disabled, true: theme.colors.success }}
-                thumbColor={state.settings.autoBlockMalicious ? '#fff' : '#f4f3f4'}
+                value={state.settings.urlScanning}
+                onValueChange={(value) => {
+                  actions.updateSettings({ urlScanning: value });
+                  showToast(
+                    value
+                      ? t("settings.urlScanningEnabled")
+                      : t("settings.urlScanningDisabled"),
+                    value ? "success" : "warning"
+                  );
+                }}
+                trackColor={{
+                  false: theme.colors.disabled,
+                  true: theme.colors.success,
+                }}
+                thumbColor={state.settings.urlScanning ? "#fff" : "#f4f3f4"}
                 ios_backgroundColor={theme.colors.disabled}
               />
             }
@@ -384,43 +530,58 @@ const SettingsScreen = ({ navigation }) => {
 
         {/* App Info Section */}
         <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
-            {t('settings.appInfo')}
+          <Text
+            style={[
+              styles.sectionTitle,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.surface,
+              },
+            ]}
+          >
+            {t("settings.appInfo")}
           </Text>
 
-          <SettingItem 
-            title={t('settings.version')} 
-            subtitle={t('settings.versionNumber')} 
+          <SettingItem
+            title={t("settings.version")}
+            subtitle={t("settings.versionNumber")}
           />
 
           <SettingItem
-            title={t('settings.privacyPolicy')}
-            subtitle={t('settings.privacyPolicySubtitle')}
+            title={t("settings.privacyPolicy")}
+            subtitle={t("settings.privacyPolicySubtitle")}
             onPress={() => {
               Alert.alert(
-                t('errors.privacyPolicyTitle'),
-                t('errors.privacyPolicyMessage')
+                t("errors.privacyPolicyTitle"),
+                t("errors.privacyPolicyMessage")
               );
             }}
-            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.view')}</Text>}
+            rightElement={
+              <Text style={[styles.editText, { color: theme.colors.primary }]}>
+                {t("common.view")}
+              </Text>
+            }
           />
 
           <SettingItem
-            title={t('settings.aboutVT')}
-            subtitle={t('settings.aboutVTSubtitle')}
+            title={t("settings.aboutVT")}
+            subtitle={t("settings.aboutVTSubtitle")}
             onPress={() => {
-              Alert.alert(
-                t('errors.aboutVTTitle'),
-                t('errors.aboutVTMessage')
-              );
+              Alert.alert(t("errors.aboutVTTitle"), t("errors.aboutVTMessage"));
             }}
-            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.info')}</Text>}
+            rightElement={
+              <Text style={[styles.editText, { color: theme.colors.primary }]}>
+                {t("common.info")}
+              </Text>
+            }
           />
         </View>
 
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
-            {t('settings.madeWith')}
+          <Text
+            style={[styles.footerText, { color: theme.colors.textSecondary }]}
+          >
+            {t("settings.madeWith")}
           </Text>
         </View>
       </ScrollView>
@@ -431,20 +592,35 @@ const SettingsScreen = ({ navigation }) => {
         animationType="slide"
         presentationStyle="pageSheet"
       >
-        <SafeAreaView style={[styles.modalContainer, { backgroundColor: theme.colors.card }]}>
-          <View style={[styles.modalHeader, { borderBottomColor: theme.colors.divider }]}>
+        <SafeAreaView
+          style={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.card },
+          ]}
+        >
+          <View
+            style={[
+              styles.modalHeader,
+              { borderBottomColor: theme.colors.divider },
+            ]}
+          >
             <TouchableOpacity
               onPress={() => {
                 setShowApiKeyModal(false);
                 setNewApiKey("");
               }}
             >
-              <Text style={[styles.cancelButton, { color: theme.colors.textSecondary }]}>
-                {t('common.cancel')}
+              <Text
+                style={[
+                  styles.cancelButton,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("common.cancel")}
               </Text>
             </TouchableOpacity>
             <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
-              {t('settings.changeApiKey')}
+              {t("settings.changeApiKey")}
             </Text>
             <TouchableOpacity
               onPress={handleChangeApiKey}
@@ -454,10 +630,12 @@ const SettingsScreen = ({ navigation }) => {
                 style={[
                   styles.saveButton,
                   { color: theme.colors.primary },
-                  (!newApiKey.trim() || isValidating) && { color: theme.colors.disabled },
+                  (!newApiKey.trim() || isValidating) && {
+                    color: theme.colors.disabled,
+                  },
                 ]}
               >
-                {isValidating ? t('settings.validating') : t('common.save')}
+                {isValidating ? t("settings.validating") : t("common.save")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -467,65 +645,93 @@ const SettingsScreen = ({ navigation }) => {
             style={styles.keyboardAvoid}
             keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
           >
-            <ScrollView 
+            <ScrollView
               style={styles.modalContent}
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={styles.modalScrollContent}
             >
-              <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
-                {t('settings.enterNewKey')}
+              <Text
+                style={[
+                  styles.modalDescription,
+                  { color: theme.colors.textSecondary },
+                ]}
+              >
+                {t("settings.enterNewKey")}
               </Text>
 
               <TextInput
-              style={[
-                styles.apiKeyInput,
-                {
-                  borderColor: theme.colors.border,
-                  color: theme.colors.text,
-                  backgroundColor: theme.colors.surface,
-                }
-              ]}
-              placeholder={t('settings.pasteKey')}
-              placeholderTextColor={theme.colors.textMuted}
-              value={newApiKey}
-              onChangeText={setNewApiKey}
-              multiline
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+                style={[
+                  styles.apiKeyInput,
+                  {
+                    borderColor: theme.colors.border,
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.surface,
+                  },
+                ]}
+                placeholder={t("settings.pasteKey")}
+                placeholderTextColor={theme.colors.textMuted}
+                value={newApiKey}
+                onChangeText={setNewApiKey}
+                multiline
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-            {isValidating && (
-              <View style={styles.validatingContainer}>
-                <ActivityIndicator size="small" color={theme.colors.primary} />
-                <Text style={[styles.validatingText, { color: theme.colors.textSecondary }]}>
-                  {t('settings.validating')}
+              {isValidating && (
+                <View style={styles.validatingContainer}>
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.primary}
+                  />
+                  <Text
+                    style={[
+                      styles.validatingText,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    {t("settings.validating")}
+                  </Text>
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={[
+                  styles.getKeyButton,
+                  {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.border,
+                  },
+                ]}
+                onPress={() => {
+                  Alert.alert(
+                    t("errors.getApiKeyTitle"),
+                    t("errors.getApiKeyMessage")
+                  );
+                }}
+              >
+                <Text
+                  style={[
+                    styles.getKeyButtonText,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  {t("settings.getKeyFree")}
                 </Text>
-              </View>
-            )}
-
-            <TouchableOpacity
-              style={[
-                styles.getKeyButton,
-                {
-                  backgroundColor: theme.colors.surface,
-                  borderColor: theme.colors.border,
-                }
-              ]}
-              onPress={() => {
-                Alert.alert(
-                  t('errors.getApiKeyTitle'),
-                  t('errors.getApiKeyMessage')
-                );
-              }}
-            >
-              <Text style={[styles.getKeyButtonText, { color: theme.colors.primary }]}>
-                {t('settings.getKeyFree')}
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
             </ScrollView>
           </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage.message}
+          type={toastMessage.type}
+          duration={2000}
+          onHide={hideToast}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -590,10 +796,6 @@ const styles = StyleSheet.create({
   countText: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: "500",
   },
   languageSelector: {
     flexDirection: "row",
@@ -673,7 +875,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "italic",
   },
-  // Modal styles
   modalContainer: {
     flex: 1,
   },

@@ -7,6 +7,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "../contexts/AppContext";
@@ -20,12 +21,13 @@ import Toast from "../components/Toast";
 const { width, height } = Dimensions.get("window");
 
 const ScannerScreen = ({ navigation }) => {
+  const [isConnected, setIsConnected] = useState(true); // Default to true initially
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [scanStage, setScanStage] = useState(null); // 'scanning' | 'analyzing' | 'queued'
   const [toast, setToast] = useState(null);
-  
+
   const { state, actions } = useApp();
   const { t } = useLocale();
   const { theme } = useThemeMode();
@@ -37,7 +39,23 @@ const ScannerScreen = ({ navigation }) => {
     }
   }, [state.apiKey]);
 
-  const showToast = (message, type = 'info') => {
+  useEffect(() => {
+    const fetchConnectionInfo = async () => {
+      const connectionInfo = await NetInfo.fetch();
+      setIsConnected(connectionInfo.isConnected);
+    };
+
+    fetchConnectionInfo();
+
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe(); // Clean up the listener when the component unmounts
+    };
+  }, []);
+  const showToast = (message, type = "info") => {
     setToast({ message, type });
   };
 
@@ -50,7 +68,7 @@ const ScannerScreen = ({ navigation }) => {
 
     setScanned(true);
     setIsProcessing(true);
-    setScanStage('scanning');
+    setScanStage("scanning");
 
     try {
       console.log("📱 QR Code scanned:", { type, data });
@@ -59,7 +77,10 @@ const ScannerScreen = ({ navigation }) => {
       if (!UrlValidator.isValidUrl(data)) {
         console.log("❌ Scanned content is not a valid URL");
         setScanStage(null);
-        showToast(t('errors.notUrlMessage', { data: data.substring(0, 50) }), 'error');
+        showToast(
+          t("errors.notUrlMessage", { data: data.substring(0, 50) }),
+          "error"
+        );
         setTimeout(() => {
           resetScanner();
         }, 3000);
@@ -76,10 +97,34 @@ const ScannerScreen = ({ navigation }) => {
       });
 
       // Show analyzing stage
-      setScanStage('analyzing');
+      setScanStage("analyzing");
 
       // Scan with VirusTotal
       console.log("🛡️ Starting VirusTotal scan...");
+      if (!isConnected) {
+        console.log("No internet connection");
+        showToast(t("errors.noInternet"), "warning"); // Use i18n for user-friendly message
+
+        // Create scan result directly without calling VirusTotal API
+        const scanResult = {
+          url: sanitizedUrl,
+          isHttps,
+          virusTotalReport: { positives: 0, total: 0 }, // Provide a default report
+          securityLevel: "unknown", // or a default value
+          domain: UrlValidator.extractDomain(sanitizedUrl),
+        };
+
+        // Add to history
+        actions.addScanResult(scanResult);
+
+        // Clear loading state
+        setScanStage(null);
+
+        // Navigate to results
+        navigation.navigate("Results", { scanResult });
+
+        return; // Stop further processing
+      }
       const report = await vtService.current.scanUrl(sanitizedUrl);
       const securityLevel = vtService.current.determineSecurityLevel(report);
 
@@ -109,14 +154,14 @@ const ScannerScreen = ({ navigation }) => {
     } catch (error) {
       console.error("Scan processing error:", error);
       setScanStage(null);
-      
+
       if (error.message === "QUEUED") {
-        showToast(t('scanner.queued'), 'warning');
+        showToast(t("scanner.queued"), "warning");
         setTimeout(() => {
           resetScanner();
         }, 3000);
       } else {
-        showToast(error.message || t('errors.scanErrorMessage'), 'error');
+        showToast(error.message || t("errors.scanErrorMessage"), "error");
         setTimeout(() => {
           resetScanner();
         }, 3000);
@@ -152,10 +197,17 @@ const ScannerScreen = ({ navigation }) => {
 
   if (!permission) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+      <View
+        style={[
+          styles.centerContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>
-          {t('scanner.requestingPermission')}
+        <Text
+          style={[styles.loadingText, { color: theme.colors.textSecondary }]}
+        >
+          {t("scanner.requestingPermission")}
         </Text>
       </View>
     );
@@ -163,19 +215,31 @@ const ScannerScreen = ({ navigation }) => {
 
   if (!permission.granted) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+      <View
+        style={[
+          styles.centerContainer,
+          { backgroundColor: theme.colors.background },
+        ]}
+      >
         <Text style={styles.errorText}>📷</Text>
         <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
-          {t('scanner.cameraRequired')}
+          {t("scanner.cameraRequired")}
         </Text>
-        <Text style={[styles.errorMessage, { color: theme.colors.textSecondary }]}>
-          {t('scanner.cameraMsg')}
+        <Text
+          style={[styles.errorMessage, { color: theme.colors.textSecondary }]}
+        >
+          {t("scanner.cameraMsg")}
         </Text>
         <TouchableOpacity
-          style={[styles.retryButton, { backgroundColor: theme.colors.primary }]}
+          style={[
+            styles.retryButton,
+            { backgroundColor: theme.colors.primary },
+          ]}
           onPress={requestPermission}
         >
-          <Text style={styles.retryButtonText}>{t('scanner.grantPermission')}</Text>
+          <Text style={styles.retryButtonText}>
+            {t("scanner.grantPermission")}
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -195,17 +259,48 @@ const ScannerScreen = ({ navigation }) => {
           {/* Scanning area */}
           <View style={styles.scanningArea}>
             <View style={styles.scanFrame}>
-              <View style={[styles.corner, styles.topLeft, { borderColor: theme.colors.scanFrame }]} />
-              <View style={[styles.corner, styles.topRight, { borderColor: theme.colors.scanFrame }]} />
-              <View style={[styles.corner, styles.bottomLeft, { borderColor: theme.colors.scanFrame }]} />
-              <View style={[styles.corner, styles.bottomRight, { borderColor: theme.colors.scanFrame }]} />
+              <View
+                style={[
+                  styles.corner,
+                  styles.topLeft,
+                  { borderColor: theme.colors.scanFrame },
+                ]}
+              />
+              <View
+                style={[
+                  styles.corner,
+                  styles.topRight,
+                  { borderColor: theme.colors.scanFrame },
+                ]}
+              />
+              <View
+                style={[
+                  styles.corner,
+                  styles.bottomLeft,
+                  { borderColor: theme.colors.scanFrame },
+                ]}
+              />
+              <View
+                style={[
+                  styles.corner,
+                  styles.bottomRight,
+                  { borderColor: theme.colors.scanFrame },
+                ]}
+              />
             </View>
 
             {scanned && !isProcessing && (
-              <View style={[styles.scanCompleteOverlay, { backgroundColor: 'rgba(76, 175, 80, 0.9)' }]}>
-                <Text style={styles.scanCompleteText}>✅ {t('scanner.complete')}</Text>
+              <View
+                style={[
+                  styles.scanCompleteOverlay,
+                  { backgroundColor: "rgba(76, 175, 80, 0.9)" },
+                ]}
+              >
+                <Text style={styles.scanCompleteText}>
+                  ✅ {t("scanner.complete")}
+                </Text>
                 <Text style={styles.scanCompleteSubtext}>
-                  {t('scanner.tapScanAgain')}
+                  {t("scanner.tapScanAgain")}
                 </Text>
               </View>
             )}
@@ -215,22 +310,31 @@ const ScannerScreen = ({ navigation }) => {
           <View style={styles.instructions}>
             {!scanned ? (
               <>
-                <Text style={styles.instructionTitle}>{t('scanner.active')}</Text>
+                <Text style={styles.instructionTitle}>
+                  {!isConnected
+                    ? t("scanner.noInternetActive")
+                    : t("scanner.active")}
+                </Text>
                 <Text style={styles.instructionText}>
-                  {t('scanner.pointCamera')}
+                  {t("scanner.pointCamera")}
                 </Text>
               </>
             ) : (
               <>
                 <Text style={styles.instructionTitle}>
-                  {isProcessing ? t('scanner.processing') : t('scanner.complete')}
+                  {isProcessing
+                    ? t("scanner.processing")
+                    : t("scanner.complete")}
                 </Text>
                 <TouchableOpacity
-                  style={[styles.cancelButton, { backgroundColor: theme.colors.danger }]}
+                  style={[
+                    styles.cancelButton,
+                    { backgroundColor: theme.colors.danger },
+                  ]}
                   onPress={resetScanner}
                 >
                   <Text style={styles.cancelButtonText}>
-                    {isProcessing ? t('common.cancel') : t('common.scanAgain')}
+                    {isProcessing ? t("common.cancel") : t("common.scanAgain")}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -241,15 +345,21 @@ const ScannerScreen = ({ navigation }) => {
           {state.scanHistory.length > 0 && (
             <View style={styles.historyIndicator}>
               <Text style={styles.historyText}>
-                📊 {t('scanner.scansInHistory', { count: state.scanHistory.length })}
+                📊{" "}
+                {t("scanner.scansInHistory", {
+                  count: state.scanHistory.length,
+                })}
               </Text>
             </View>
           )}
 
           {/* Floating Settings Button - Top Right */}
           <TouchableOpacity
-            style={[styles.floatingSettingsButton, { backgroundColor: theme.colors.primary }]}
-            onPress={() => navigation.navigate('Settings')}
+            style={[
+              styles.floatingSettingsButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+            onPress={() => navigation.navigate("Settings")}
           >
             <Text style={styles.floatingSettingsIcon}>⚙️</Text>
           </TouchableOpacity>

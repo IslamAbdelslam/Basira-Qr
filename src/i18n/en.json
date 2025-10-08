@@ -24,6 +24,7 @@
   "scanner": {
     "title": "Scanner",
     "active": "🛡️ BasiraQr Active",
+    "noInternetActive": "Active (No Internet)",
     "pointCamera": "Point your camera at a QR code to scan it safely",
     "processing": "Checking URL security...",
     "complete": "Scan Complete",
@@ -38,7 +39,15 @@
     "scanningQR": "Processing QR Code...",
     "analyzingUrl": "Analyzing URL...",
     "pleaseWait": "Please wait",
-    "waitingForAnalysis": "This may take a moment"
+    "waitingForAnalysis": "This may take a moment",
+    "offline": "🔴 BasiraQr Disabled",
+    "disabled": "⚠️ Scanning Disabled",
+    "noInternet": "⚠️ No internet connection. Opening URL directly...",
+    "noInternetBanner": "No Internet - URLs will open without scanning",
+    "scanningDisabled": "URL Scanning is disabled. Opening directly...",
+    "scanningDisabledBanner": "URL Scanning Disabled - Links open directly",
+    "scanningDisabledMsg": "URLs will open directly without security check",
+    "willOpenDirectly": "QR codes will open directly without scanning"
   },
   "results": {
     "title": "Scan Results",
@@ -118,9 +127,16 @@
     "arabic": "العربية",
     "light": "☀️ Light",
     "dark": "🌙 Dark",
-    "system": "⚙️ System"
+    "system": "⚙️ System",
+    "urlScanning": "URL Scanning",
+    "urlScanningSubtitle": "Scan URLs with VirusTotal before opening",
+    "httpsWarningEnabled": "HTTPS warnings enabled",
+    "httpsWarningDisabled": "HTTPS warnings disabled",
+    "urlScanningEnabled": "✅ URL scanning enabled - URLs will be checked",
+    "urlScanningDisabled": "⚠️ URL scanning disabled - URLs will open directly"
   },
   "errors": {
+    "noInternet": "No internet connection. Scanning without VirusTotal.",
     "notUrl": "Not a URL",
     "notUrlMessage": "Scanned content: {data}\n\nThis QR code doesn't contain a URL.",
     "scanError": "Scan Error",
@@ -154,5 +170,3 @@
     "failedToRemove": "Failed to remove API key"
   }
 }
-
-

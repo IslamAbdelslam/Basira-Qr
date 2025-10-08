@@ -26,6 +26,7 @@
     "active": "🛡️ بصيرة كيو آر نشط",
     "pointCamera": "وجّه الكاميرا نحو رمز QR لمسحه بأمان",
     "processing": "جارٍ التحقق من أمان الرابط...",
+    "noInternetActive": "نشط (لا يوجد إنترنت)",
     "complete": "اكتمل المسح",
     "tapScanAgain": "اضغط \"امسح مرة أخرى\" لمسح رمز آخر",
     "grantPermission": "منح الإذن",
@@ -38,7 +39,15 @@
     "scanningQR": "جارٍ معالجة رمز QR...",
     "analyzingUrl": "جارٍ تحليل الرابط...",
     "pleaseWait": "يرجى الانتظار",
-    "waitingForAnalysis": "قد يستغرق هذا بعض الوقت"
+    "waitingForAnalysis": "قد يستغرق هذا بعض الوقت",
+    "offline": "🔴 بصيرة كيو آر معطل",
+    "disabled": "⚠️ المسح معطل",
+    "noInternet": "⚠️ لا يوجد اتصال بالإنترنت. سيتم فتح الرابط مباشرة...",
+    "noInternetBanner": "لا يوجد إنترنت - ستفتح الروابط دون مسح",
+    "scanningDisabled": "مسح الروابط معطل. سيتم الفتح مباشرة...",
+    "scanningDisabledBanner": "مسح الروابط معطل - تفتح الروابط مباشرة",
+    "scanningDisabledMsg": "ستفتح الروابط مباشرة دون فحص أمني",
+    "willOpenDirectly": "ستفتح رموز QR مباشرة دون مسح"
   },
   "results": {
     "title": "نتائج المسح",
@@ -118,11 +127,18 @@
     "arabic": "العربية",
     "light": "☀️ فاتح",
     "dark": "🌙 داكن",
-    "system": "⚙️ النظام"
+    "system": "⚙️ النظام",
+    "urlScanning": "مسح الروابط",
+    "urlScanningSubtitle": "فحص الروابط مع VirusTotal قبل الفتح",
+    "httpsWarningEnabled": "تم تفعيل تحذيرات HTTPS",
+    "httpsWarningDisabled": "تم تعطيل تحذيرات HTTPS",
+    "urlScanningEnabled": "✅ تم تفعيل مسح الروابط - سيتم فحص الروابط",
+    "urlScanningDisabled": "⚠️ تم تعطيل مسح الروابط - ستفتح الروابط مباشرة"
   },
   "errors": {
     "notUrl": "ليس رابط",
     "notUrlMessage": "المحتوى الممسوح: {data}\n\nهذا الرمز لا يحتوي على رابط.",
+    "noInternet": "لا يوجد اتصال بالإنترنت. يتم الفحص بدون VirusTotal.",
     "scanError": "خطأ في المسح",
     "scanErrorMessage": "فشل معالجة رمز QR. يرجى المحاولة مرة أخرى.",
     "invalidApiKey": "مفتاح API غير صالح",
@@ -154,5 +170,3 @@
     "failedToRemove": "فشل إزالة مفتاح API"
   }
 }
-
-
