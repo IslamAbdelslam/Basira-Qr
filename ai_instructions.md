@@ -1,5 +1,5 @@
 # AI Development Instructions
-## OkiQr Implementation Guide
+## BasiraQr Implementation Guide
 
 ### 1. Development Environment Setup
 
@@ -10,8 +10,8 @@
 npm install -g @expo/cli
 
 # Create new Expo project
-npx create-expo-app SecureQRScanner --template blank-typescript
-cd SecureQRScanner
+npx create-expo-app BasiraQr Scanner --template blank-typescript
+cd BasiraQr Scanner
 ```
 
 #### 1.2 Required Dependencies

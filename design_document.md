@@ -1,5 +1,5 @@
 # Design Document
-## OkiQr - Architecture & Implementation
+## BasiraQr - Architecture & Implementation
 
 ### 1. System Architecture
 
@@ -17,7 +17,7 @@
 
 #### 1.2 Component Architecture
 ```
-SecureQR App
+BasiraQr App
 ├── Authentication Layer
 │   ├── API Key Management
 │   └── Key Validation
@@ -116,7 +116,7 @@ Browser (External)
 #### 3.2 Screen Specifications
 
 **Setup Screen**
-- Title: "Welcome to SecureQR"
+- Title: "Welcome to BasiraQr
 - Input field for VirusTotal API key
 - "Get API Key" link to VirusTotal
 - Validation status indicator

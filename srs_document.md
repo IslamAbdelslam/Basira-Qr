@@ -1,13 +1,13 @@
 # Software Requirements Specification (SRS)
-## OkiQr - QR Code Security Guardian
+## BasiraQr - QR Code Security Guardian
 
 ### 1. Introduction
 
 #### 1.1 Purpose
-This document specifies the requirements for OkiQr, a mobile application designed to protect users from malicious URLs found in QR codes by leveraging VirusTotal's API for threat detection.
+This document specifies the requirements for BasiraQr , a mobile application designed to protect users from malicious URLs found in QR codes by leveraging VirusTotal's API for threat detection.
 
 #### 1.2 Scope
-OkiQr is a React Native mobile application that scans QR codes, validates URLs against VirusTotal's database, and provides security recommendations before allowing users to access the links.
+BasiraQr is a React Native mobile application that scans QR codes, validates URLs against VirusTotal's database, and provides security recommendations before allowing users to access the links.
 
 #### 1.3 Target Audience
 - General mobile users concerned about QR code security
@@ -17,7 +17,7 @@ OkiQr is a React Native mobile application that scans QR codes, validates URLs a
 ### 2. Overall Description
 
 #### 2.1 Product Perspective
-OkiQr acts as a security layer between users and potentially malicious QR codes by:
+BasiraQr acts as a security layer between users and potentially malicious QR codes by:
 - Intercepting QR code scans
 - Validating URLs through VirusTotal API
 - Providing security assessments

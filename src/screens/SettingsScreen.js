@@ -134,7 +134,7 @@ const SettingsScreen = ({ navigation }) => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Settings</Text>
           <Text style={styles.headerSubtitle}>
-            Manage your OkiQr preferences
+            Manage your BasiraQr preferences
           </Text>
         </View>
 
@@ -198,7 +198,7 @@ const SettingsScreen = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>ℹ️ App Information</Text>
 
-          <SettingItem title="Version" subtitle="OkiQr v1.0.0" />
+          <SettingItem title="Version" subtitle="BasiraQr v1.0.0" />
 
           <SettingItem
             title="Privacy Policy"
@@ -206,7 +206,7 @@ const SettingsScreen = ({ navigation }) => {
             onPress={() => {
               Alert.alert(
                 "Privacy Policy",
-                "OkiQr:\n\n• Stores your API key securely on device\n• Sends scanned URLs to VirusTotal for analysis\n• Does not collect personal data\n• Scan history stays on your device"
+                "BasiraQr :\n\n• Stores your API key securely on device\n• Sends scanned URLs to VirusTotal for analysis\n• Does not collect personal data\n• Scan history stays on your device"
               );
             }}
             rightElement={<Text style={styles.editText}>View</Text>}

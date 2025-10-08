@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,22 +8,22 @@ import {
   Alert,
   Linking,
   Share,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SecurityBadge = ({ level }) => {
   const getBadgeStyle = (level) => {
     switch (level) {
-      case 'SAFE':
-        return { backgroundColor: '#4CAF50', icon: '✅' };
-      case 'SUSPICIOUS':
-        return { backgroundColor: '#FF9800', icon: '⚠️' };
-      case 'MALICIOUS':
-        return { backgroundColor: '#F44336', icon: '🚨' };
-      case 'UNKNOWN':
-        return { backgroundColor: '#9E9E9E', icon: '❓' };
+      case "SAFE":
+        return { backgroundColor: "#4CAF50", icon: "✅" };
+      case "SUSPICIOUS":
+        return { backgroundColor: "#FF9800", icon: "⚠️" };
+      case "MALICIOUS":
+        return { backgroundColor: "#F44336", icon: "🚨" };
+      case "UNKNOWN":
+        return { backgroundColor: "#9E9E9E", icon: "❓" };
       default:
-        return { backgroundColor: '#9E9E9E', icon: '❓' };
+        return { backgroundColor: "#9E9E9E", icon: "❓" };
     }
   };
 
@@ -43,35 +43,37 @@ const ResultsScreen = ({ route, navigation }) => {
 
   const getSecurityMessage = (level, positives, total) => {
     switch (level) {
-      case 'SAFE':
+      case "SAFE":
         return {
-          title: 'Safe to Visit',
+          title: "Safe to Visit",
           message: `This URL appears safe. No security vendors flagged it as malicious.`,
-          action: 'You can safely open this link.',
+          action: "You can safely open this link.",
         };
-      case 'SUSPICIOUS':
+      case "SUSPICIOUS":
         return {
-          title: 'Potentially Suspicious',
+          title: "Potentially Suspicious",
           message: `${positives} out of ${total} security vendors flagged this URL. Exercise caution.`,
-          action: 'Consider avoiding this link or verify its authenticity first.',
+          action:
+            "Consider avoiding this link or verify its authenticity first.",
         };
-      case 'MALICIOUS':
+      case "MALICIOUS":
         return {
-          title: 'Dangerous URL',
+          title: "Dangerous URL",
           message: `${positives} out of ${total} security vendors flagged this as malicious.`,
-          action: 'Do not visit this link. It may harm your device or steal your data.',
+          action:
+            "Do not visit this link. It may harm your device or steal your data.",
         };
-      case 'UNKNOWN':
+      case "UNKNOWN":
         return {
-          title: 'Unknown URL',
-          message: 'This URL was not found in VirusTotal\'s database.',
-          action: 'Proceed with caution. Consider the source before visiting.',
+          title: "Unknown URL",
+          message: "This URL was not found in VirusTotal's database.",
+          action: "Proceed with caution. Consider the source before visiting.",
         };
       default:
         return {
-          title: 'Analysis Error',
-          message: 'Unable to determine security status.',
-          action: 'Exercise caution when visiting this link.',
+          title: "Analysis Error",
+          message: "Unable to determine security status.",
+          action: "Exercise caution when visiting this link.",
         };
     }
   };
@@ -83,27 +85,27 @@ const ResultsScreen = ({ route, navigation }) => {
   );
 
   const handleOpenUrl = () => {
-    if (scanResult.securityLevel === 'MALICIOUS') {
+    if (scanResult.securityLevel === "MALICIOUS") {
       Alert.alert(
-        'Dangerous URL',
-        'This URL has been flagged as malicious. Are you sure you want to open it?',
+        "Dangerous URL",
+        "This URL has been flagged as malicious. Are you sure you want to open it?",
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: "Cancel", style: "cancel" },
           {
-            text: 'Open Anyway',
-            style: 'destructive',
+            text: "Open Anyway",
+            style: "destructive",
             onPress: () => Linking.openURL(scanResult.url),
           },
         ]
       );
-    } else if (scanResult.securityLevel === 'SUSPICIOUS') {
+    } else if (scanResult.securityLevel === "SUSPICIOUS") {
       Alert.alert(
-        'Suspicious URL',
-        'This URL has been flagged by some security vendors. Proceed with caution.',
+        "Suspicious URL",
+        "This URL has been flagged by some security vendors. Proceed with caution.",
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: "Cancel", style: "cancel" },
           {
-            text: 'Open Carefully',
+            text: "Open Carefully",
             onPress: () => Linking.openURL(scanResult.url),
           },
         ]
@@ -115,33 +117,38 @@ const ResultsScreen = ({ route, navigation }) => {
 
   const handleShareResults = async () => {
     try {
-      const shareMessage = `SecureQR Scan Results:
+      const shareMessage = `BasiraQr Scan Results:
 URL: ${scanResult.url}
 Security Status: ${scanResult.securityLevel}
-VirusTotal Score: ${scanResult.virusTotalReport.positives}/${scanResult.virusTotalReport.total}
-HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
+VirusTotal Score: ${scanResult.virusTotalReport.positives}/${
+        scanResult.virusTotalReport.total
+      }
+HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
 
       await Share.share({
         message: shareMessage,
-        title: 'SecureQR Scan Results',
+        title: "BasiraQr Scan Results",
       });
     } catch (error) {
-      console.error('Share failed:', error);
+      console.error("Share failed:", error);
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     try {
       return new Date(dateString).toLocaleString();
     } catch {
-      return 'N/A';
+      return "N/A";
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Main Security Status */}
         <View style={styles.mainStatus}>
           <SecurityBadge level={scanResult.securityLevel} />
@@ -163,11 +170,13 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
               </View>
               <View style={styles.urlDetailItem}>
                 <Text style={styles.urlDetailLabel}>Protocol:</Text>
-                <Text style={[
-                  styles.urlDetailValue,
-                  { color: scanResult.isHttps ? '#4CAF50' : '#FF9800' }
-                ]}>
-                  {scanResult.isHttps ? '🔒 HTTPS' : '⚠️ HTTP'}
+                <Text
+                  style={[
+                    styles.urlDetailValue,
+                    { color: scanResult.isHttps ? "#4CAF50" : "#FF9800" },
+                  ]}
+                >
+                  {scanResult.isHttps ? "🔒 HTTPS" : "⚠️ HTTP"}
                 </Text>
               </View>
             </View>
@@ -180,11 +189,14 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
           <View style={styles.analysisContainer}>
             <View style={styles.scoreContainer}>
               <Text style={styles.scoreNumber}>
-                {scanResult.virusTotalReport.positives}/{scanResult.virusTotalReport.total}
+                {scanResult.virusTotalReport.positives}/
+                {scanResult.virusTotalReport.total}
               </Text>
-              <Text style={styles.scoreLabel}>Security vendors flagged this URL</Text>
+              <Text style={styles.scoreLabel}>
+                Security vendors flagged this URL
+              </Text>
             </View>
-            
+
             {!scanResult.isHttps && (
               <View style={styles.warningContainer}>
                 <Text style={styles.warningText}>
@@ -192,7 +204,7 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
                 </Text>
               </View>
             )}
-            
+
             <Text style={styles.actionText}>{securityInfo.action}</Text>
           </View>
         </View>
@@ -204,9 +216,7 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
             onPress={() => setShowDetails(!showDetails)}
           >
             <Text style={styles.sectionTitle}>📊 Detailed Report</Text>
-            <Text style={styles.toggleIcon}>
-              {showDetails ? '▼' : '▶'}
-            </Text>
+            <Text style={styles.toggleIcon}>{showDetails ? "▼" : "▶"}</Text>
           </TouchableOpacity>
 
           {showDetails && (
@@ -217,7 +227,7 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
                   {formatDate(scanResult.virusTotalReport.scanDate)}
                 </Text>
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Response Code:</Text>
                 <Text style={styles.detailValue}>
@@ -237,7 +247,9 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
               {scanResult.virusTotalReport.permalink && (
                 <TouchableOpacity
                   style={styles.permalinkButton}
-                  onPress={() => Linking.openURL(scanResult.virusTotalReport.permalink)}
+                  onPress={() =>
+                    Linking.openURL(scanResult.virusTotalReport.permalink)
+                  }
                 >
                   <Text style={styles.permalinkText}>
                     View Full Report on VirusTotal
@@ -246,22 +258,29 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
               )}
 
               {/* Vendor Results */}
-              {Object.keys(scanResult.virusTotalReport.scans || {}).length > 0 && (
+              {Object.keys(scanResult.virusTotalReport.scans || {}).length >
+                0 && (
                 <View style={styles.vendorResults}>
-                  <Text style={styles.vendorTitle}>Security Vendor Results:</Text>
+                  <Text style={styles.vendorTitle}>
+                    Security Vendor Results:
+                  </Text>
                   {Object.entries(scanResult.virusTotalReport.scans)
                     .slice(0, 10) // Show first 10 vendors
                     .map(([vendor, result]) => (
-                    <View key={vendor} style={styles.vendorRow}>
-                      <Text style={styles.vendorName}>{vendor}</Text>
-                      <Text style={[
-                        styles.vendorResult,
-                        { color: result.detected ? '#F44336' : '#4CAF50' }
-                      ]}>
-                        {result.detected ? (result.result || 'Malicious') : 'Clean'}
-                      </Text>
-                    </View>
-                  ))}
+                      <View key={vendor} style={styles.vendorRow}>
+                        <Text style={styles.vendorName}>{vendor}</Text>
+                        <Text
+                          style={[
+                            styles.vendorResult,
+                            { color: result.detected ? "#F44336" : "#4CAF50" },
+                          ]}
+                        >
+                          {result.detected
+                            ? result.result || "Malicious"
+                            : "Clean"}
+                        </Text>
+                      </View>
+                    ))}
                 </View>
               )}
             </View>
@@ -270,21 +289,21 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          {scanResult.securityLevel === 'SAFE' ? (
+          {scanResult.securityLevel === "SAFE" ? (
             <TouchableOpacity
               style={[styles.actionButton, styles.safeButton]}
               onPress={handleOpenUrl}
             >
               <Text style={styles.actionButtonText}>🌐 Open Safely</Text>
             </TouchableOpacity>
-          ) : scanResult.securityLevel === 'SUSPICIOUS' ? (
+          ) : scanResult.securityLevel === "SUSPICIOUS" ? (
             <TouchableOpacity
               style={[styles.actionButton, styles.cautionButton]}
               onPress={handleOpenUrl}
             >
               <Text style={styles.actionButtonText}>⚠️ Open with Caution</Text>
             </TouchableOpacity>
-          ) : scanResult.securityLevel === 'MALICIOUS' ? (
+          ) : scanResult.securityLevel === "MALICIOUS" ? (
             <TouchableOpacity
               style={[styles.actionButton, styles.dangerButton]}
               onPress={handleOpenUrl}
@@ -322,27 +341,27 @@ HTTPS: ${scanResult.isHttps ? 'Yes' : 'No'}`;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flex: 1,
     padding: 20,
   },
   mainStatus: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 15,
     padding: 25,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
   },
   securityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 25,
@@ -353,29 +372,29 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   badgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statusTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   statusMessage: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     lineHeight: 24,
   },
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -383,149 +402,149 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 15,
   },
   urlContainer: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     padding: 15,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: "#2196F3",
   },
   urlText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 10,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
   },
   urlDetails: {
     marginTop: 10,
   },
   urlDetailItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 5,
   },
   urlDetailLabel: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: 'bold',
+    color: "#666",
+    fontWeight: "bold",
   },
   urlDetailValue: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
   },
   analysisContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   scoreContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
   },
   scoreNumber: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   scoreLabel: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginTop: 5,
   },
   warningContainer: {
-    backgroundColor: '#fff3cd',
+    backgroundColor: "#fff3cd",
     padding: 10,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
+    borderLeftColor: "#ffc107",
     marginBottom: 15,
-    width: '100%',
+    width: "100%",
   },
   warningText: {
-    color: '#856404',
+    color: "#856404",
     fontSize: 14,
   },
   actionText: {
     fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
     lineHeight: 24,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   detailsToggle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   toggleIcon: {
     fontSize: 18,
-    color: '#666',
+    color: "#666",
   },
   detailsContainer: {
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: "#eee",
     paddingTop: 15,
   },
   detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   detailLabel: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: 'bold',
+    color: "#666",
+    fontWeight: "bold",
     flex: 1,
   },
   detailValue: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     flex: 2,
-    textAlign: 'right',
+    textAlign: "right",
   },
   permalinkButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
     padding: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   permalinkText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   vendorResults: {
     marginTop: 15,
   },
   vendorTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
   },
   vendorRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 5,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   vendorName: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     flex: 1,
   },
   vendorResult: {
     fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'right',
+    fontWeight: "bold",
+    textAlign: "right",
   },
   actionButtons: {
     marginTop: 10,
@@ -534,35 +553,35 @@ const styles = StyleSheet.create({
   actionButton: {
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   safeButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   cautionButton: {
-    backgroundColor: '#FF9800',
+    backgroundColor: "#FF9800",
   },
   dangerButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   unknownButton: {
-    backgroundColor: '#9E9E9E',
+    backgroundColor: "#9E9E9E",
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: "#2196F3",
   },
   actionButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   secondaryButtonText: {
-    color: '#2196F3',
+    color: "#2196F3",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Building OkiQr APK..."
+echo "🚀 Building BasiraQr APK..."
 echo
 
 echo "📋 Step 1: Installing EAS CLI..."

@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "OkiQr",
-    "slug": "secureqr-scanner",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "name": "BasiraQr",
+    "slug": "basiraqr",
+    "version": "1.5.0",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -16,8 +16,20 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.BasiraQr .scanner",
       "infoPlist": {
-        "NSCameraUsageDescription": "OkiQr needs camera access to scan QR codes for security analysis."
+        "NSCameraUsageDescription": "BasiraQr needs camera access to scan QR codes for security analysis.",
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ]
       }
     },
     "android": {
@@ -31,20 +43,30 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.secureqr.scanner",
-      "versionCode": 1
+      "package": "com.basiraQr.scanner",
+      "versionCode": 1,
+      "screenOrientation": "unspecified"  
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow OkiQr to access your camera to scan QR codes for security analysis."
-        }
-      ]
-    ],
+  [
+    "expo-camera",
+    {
+      "cameraPermission": "Allow BasiraQr to access your camera to scan QR codes for security analysis."
+    }
+  ],
+  [
+    "expo-build-properties",
+    {
+      "android": {
+        "enableProguardInReleaseBuilds": true,
+        "enableShrinkResourcesInReleaseBuilds": true
+      }
+    }
+  ]
+],
     "extra": {
       "eas": {
         "projectId": "78de9798-c5d3-4058-ba86-d458ad46737d"

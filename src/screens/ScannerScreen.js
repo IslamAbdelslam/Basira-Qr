@@ -137,7 +137,7 @@ const ScannerScreen = ({ navigation }) => {
         <Text style={styles.errorText}>📷</Text>
         <Text style={styles.errorTitle}>Camera Permission Required</Text>
         <Text style={styles.errorMessage}>
-          SecureQR needs camera access to scan QR codes.
+          BasiraQr needs camera access to scan QR codes.
         </Text>
         <TouchableOpacity
           style={styles.retryButton}
@@ -202,7 +202,7 @@ const ScannerScreen = ({ navigation }) => {
           <View style={styles.instructions}>
             {!scanned ? (
               <>
-                <Text style={styles.instructionTitle}>🛡️ OkiQr Active</Text>
+                <Text style={styles.instructionTitle}>🛡️ BasiraQr Active</Text>
                 <Text style={styles.instructionText}>
                   Point your camera at a QR code to scan it safely
                 </Text>

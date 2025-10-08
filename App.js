@@ -62,7 +62,7 @@ export default function App() {
               name="Setup"
               component={SetupScreen}
               options={{
-                title: "SecureQR Setup",
+                title: "BasiraQr Setup",
                 headerLeft: null,
               }}
             />
@@ -70,7 +70,7 @@ export default function App() {
               name="Scanner"
               component={ScannerScreen}
               options={({ navigation }) => ({
-                title: "OkiQr",
+                title: "BasiraQr ",
                 headerRight: () => (
                   <TouchableOpacity
                     style={{ marginRight: 15 }}

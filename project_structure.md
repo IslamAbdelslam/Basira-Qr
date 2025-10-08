@@ -62,11 +62,11 @@ Create this as a shell script to automate setup:
 
 ```bash
 #!/bin/bash
-echo "Setting up OkiQr..."
+echo "Setting up BasiraQr ..."
 
 # Create project
-npx create-expo-app SecureQRScanner --template blank
-cd SecureQRScanner
+npx create-expo-app BasiraQr Scanner --template blank
+cd BasiraQr Scanner
 
 # Create directory structure
 mkdir -p src/{screens,services,contexts,components/common,utils,types}

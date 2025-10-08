@@ -1,0 +1,48 @@
+{
+  "app": {
+    "name": "BasiraQr"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "settings": "Settings",
+    "scanAgain": "Scan Again"
+  },
+  "setup": {
+    "welcome": "Welcome to BasiraQr",
+    "protect": "Protect yourself from malicious QR codes",
+    "getKey": "Get Free API Key",
+    "enterKey": "Enter your API Key:",
+    "validateContinue": "Validate & Continue",
+    "privacyTitle": "Privacy Notice",
+    "privacy": "Your API key is stored securely on your device only. URLs are sent to VirusTotal for analysis as per their privacy policy."
+  },
+  "scanner": {
+    "active": "BasiraQr Active",
+    "pointCamera": "Point your camera at a QR code to scan it safely",
+    "processing": "Checking URL security...",
+    "complete": "Scan Complete",
+    "tapScanAgain": "Tap \"Scan Again\" to scan another QR code",
+    "grantPermission": "Grant Permission",
+    "cameraRequired": "Camera Permission Required",
+    "cameraMsg": "BasiraQr needs camera access to scan QR codes.",
+    "queued": "Analysis queued...",
+    "loading": "Analyzing..."
+  },
+  "results": {
+    "title": "Scan Results",
+    "openSafely": "Open Safely",
+    "openCaution": "Open with Caution",
+    "doNotOpen": "Do Not Open",
+    "openOwnRisk": "Open at Own Risk",
+    "share": "Share Results",
+    "scanAnother": "Scan Another",
+    "urlInfo": "URL Information",
+    "domain": "Domain:",
+    "protocol": "Protocol:",
+    "vendorsFlagged": "Security vendors flagged this URL",
+    "detailedReport": "Detailed Report"
+  }
+}
+
+

@@ -1,4 +1,4 @@
-# Quick Start Guide - OkiQr
+# Quick Start Guide - BasiraQr 
 
 ## 🚀 Get Started in 5 Minutes
 
@@ -80,4 +80,4 @@ npx expo run:android
 
 ## 🎯 Ready to Use!
 
-Your OkiQr is now ready to protect you from malicious QR codes!
+Your BasiraQr is now ready to protect you from malicious QR codes!

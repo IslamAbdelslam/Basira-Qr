@@ -1,4 +1,4 @@
-# OkiQr
+# BasiraQr
 
 A secure QR code scanner that protects users from malicious links using VirusTotal API. This app acts as a guardian between users and potentially dangerous QR codes by scanning URLs through VirusTotal's security analysis before allowing access.
 
@@ -32,7 +32,7 @@ A secure QR code scanner that protects users from malicious links using VirusTot
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd SecureQRScanner
+   cd BasiraQr Scanner
    ```
 
 2. **Install dependencies**
@@ -131,7 +131,7 @@ VirusTotal free tier includes:
 ### Common Issues
 
 1. **Camera Permission Denied**
-   - Go to Android Settings → Apps → OkiQr → Permissions
+   - Go to Android Settings → Apps → BasiraQr → Permissions
    - Enable Camera permission
 
 2. **API Key Invalid**
