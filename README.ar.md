@@ -50,7 +50,7 @@
 ### التثبيت
 ```bash
 # استنساخ المستودع
-git clone https://github.com/your-username/BasiraQr.git
+git clone https://github.com/IslamAbdelslam/BasiraQr.git
 cd BasiraQr
 
 # تثبيت التبعيات

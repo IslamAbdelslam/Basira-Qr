@@ -50,7 +50,7 @@ BasiraQr is a modern, secure QR code scanner that integrates with VirusTotal's t
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/BasiraQr.git
+git clone https://github.com/IslamAbdelslam/BasiraQr.git
 cd BasiraQr
 
 # Install dependencies
