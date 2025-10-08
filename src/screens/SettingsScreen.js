@@ -9,6 +9,9 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  Switch,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "../contexts/AppContext";
@@ -20,7 +23,7 @@ import VirusTotalService from "../services/VirusTotalService";
 const SettingsScreen = ({ navigation }) => {
   const { state, actions } = useApp();
   const { t, locale, changeLocale } = useLocale();
-  const { theme, mode, setMode } = useThemeMode();
+  const { theme, mode, setMode, colorScheme, setColorScheme, availableSchemes } = useThemeMode();
   
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [newApiKey, setNewApiKey] = useState("");
@@ -254,6 +257,49 @@ const SettingsScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Color Scheme Selector */}
+          <View style={[styles.settingItem, { borderBottomWidth: 0 }]}>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
+                Color Scheme
+              </Text>
+              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+                Choose your preferred color
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.colorSchemeGrid, { paddingHorizontal: 20, paddingBottom: 15 }]}>
+            {availableSchemes.map((scheme) => {
+              const schemeColors = {
+                indigo: '#6366F1',
+                teal: '#14B8A6',
+                orange: '#F97316',
+                purple: '#A855F7',
+                blue: '#2196F3',
+                green: '#10B981',
+              };
+              
+              return (
+                <TouchableOpacity
+                  key={scheme}
+                  style={[
+                    styles.colorSchemeButton,
+                    { backgroundColor: schemeColors[scheme] },
+                    colorScheme === scheme && styles.colorSchemeButtonActive,
+                  ]}
+                  onPress={() => setColorScheme(scheme)}
+                >
+                  {colorScheme === scheme && (
+                    <Text style={styles.colorSchemeCheck}>✓</Text>
+                  )}
+                  <Text style={styles.colorSchemeName}>
+                    {scheme.charAt(0).toUpperCase() + scheme.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         {/* API Key Section */}
@@ -310,13 +356,29 @@ const SettingsScreen = ({ navigation }) => {
           <SettingItem
             title={t('settings.httpsWarning')}
             subtitle={t('settings.httpsWarningSubtitle')}
-            rightElement={<Text style={[styles.statusText, { color: theme.colors.success }]}>{t('settings.enabled')}</Text>}
+            rightElement={
+              <Switch
+                value={state.settings.httpsWarning}
+                onValueChange={(value) => actions.updateSettings({ httpsWarning: value })}
+                trackColor={{ false: theme.colors.disabled, true: theme.colors.success }}
+                thumbColor={state.settings.httpsWarning ? '#fff' : '#f4f3f4'}
+                ios_backgroundColor={theme.colors.disabled}
+              />
+            }
           />
 
           <SettingItem
             title={t('settings.autoBlock')}
             subtitle={t('settings.autoBlockSubtitle')}
-            rightElement={<Text style={[styles.statusText, { color: theme.colors.success }]}>{t('settings.enabled')}</Text>}
+            rightElement={
+              <Switch
+                value={state.settings.autoBlockMalicious}
+                onValueChange={(value) => actions.updateSettings({ autoBlockMalicious: value })}
+                trackColor={{ false: theme.colors.disabled, true: theme.colors.success }}
+                thumbColor={state.settings.autoBlockMalicious ? '#fff' : '#f4f3f4'}
+                ios_backgroundColor={theme.colors.disabled}
+              />
+            }
           />
         </View>
 
@@ -400,12 +462,21 @@ const SettingsScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.modalContent}>
-            <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
-              {t('settings.enterNewKey')}
-            </Text>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardAvoid}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+          >
+            <ScrollView 
+              style={styles.modalContent}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={styles.modalScrollContent}
+            >
+              <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+                {t('settings.enterNewKey')}
+              </Text>
 
-            <TextInput
+              <TextInput
               style={[
                 styles.apiKeyInput,
                 {
@@ -451,7 +522,8 @@ const SettingsScreen = ({ navigation }) => {
                 {t('settings.getKeyFree')}
               </Text>
             </TouchableOpacity>
-          </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
@@ -553,6 +625,45 @@ const styles = StyleSheet.create({
   themeButtonText: {
     fontSize: 20,
   },
+  colorSchemeGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  colorSchemeButton: {
+    width: 100,
+    height: 80,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  colorSchemeButtonActive: {
+    borderWidth: 3,
+    borderColor: "#fff",
+    shadowOpacity: 0.4,
+    elevation: 6,
+  },
+  colorSchemeCheck: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    fontSize: 20,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  colorSchemeName: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
   footer: {
     padding: 20,
     alignItems: "center",
@@ -565,6 +676,12 @@ const styles = StyleSheet.create({
   // Modal styles
   modalContainer: {
     flex: 1,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  modalScrollContent: {
+    paddingBottom: 40,
   },
   modalHeader: {
     flexDirection: "row",

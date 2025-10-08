@@ -8,6 +8,7 @@ const AppActionTypes = {
   ADD_SCAN_RESULT: 'ADD_SCAN_RESULT',
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
+  UPDATE_SETTINGS: 'UPDATE_SETTINGS',
 };
 
 // Initial state
@@ -17,6 +18,10 @@ const initialState = {
   scanHistory: [],
   isLoading: false,
   error: null,
+  settings: {
+    httpsWarning: true,
+    autoBlockMalicious: true,
+  },
 };
 
 // Reducer
@@ -46,6 +51,14 @@ const appReducer = (state, action) => {
       return {
         ...state,
         error: action.payload,
+      };
+    case AppActionTypes.UPDATE_SETTINGS:
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          ...action.payload,
+        },
       };
     default:
       return state;
@@ -93,12 +106,30 @@ export const AppProvider = ({ children }) => {
       dispatch({ type: AppActionTypes.SET_ERROR, payload: null });
     },
 
+    updateSettings: async (newSettings) => {
+      try {
+        await StorageService.storeSettings(newSettings);
+        dispatch({ type: AppActionTypes.UPDATE_SETTINGS, payload: newSettings });
+      } catch (error) {
+        console.error('Error updating settings:', error);
+        throw error;
+      }
+    },
+
     loadInitialData: async () => {
       try {
-        const apiKey = await StorageService.getApiKey();
+        const [apiKey, settings] = await Promise.all([
+          StorageService.getApiKey(),
+          StorageService.getSettings(),
+        ]);
+        
         if (apiKey) {
           dispatch({ type: AppActionTypes.SET_API_KEY, payload: apiKey });
           dispatch({ type: AppActionTypes.SET_SETUP_COMPLETE, payload: true });
+        }
+        
+        if (settings && Object.keys(settings).length > 0) {
+          dispatch({ type: AppActionTypes.UPDATE_SETTINGS, payload: settings });
         }
       } catch (error) {
         console.error('Error loading initial data:', error);

@@ -42,6 +42,15 @@ class StorageService {
   static async getThemeMode() {
     return await AsyncStorage.getItem("app_theme_mode");
   }
+
+  // Color scheme storage
+  static async storeColorScheme(scheme) {
+    await AsyncStorage.setItem("app_color_scheme", scheme);
+  }
+
+  static async getColorScheme() {
+    return await AsyncStorage.getItem("app_color_scheme");
+  }
 }
 
 export default StorageService;
