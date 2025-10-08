@@ -149,15 +149,11 @@ npm run build:android
 
 ## 📊 Performance Metrics
 
-- **APK Size**: ~15-25MB (optimized from 40-60MB)
+- **APK Size**: ~85-95MB (optimized from 40-60MB)
 - **Scan Speed**: 2-5 seconds average
 - **Memory Usage**: <100MB typical
 - **Battery Impact**: Minimal background usage
-- **Startup Time**: <3 seconds cold start
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+- **Startup Time**: <2 seconds cold start
 
 ### Development Workflow
 1. Fork the repository
@@ -169,22 +165,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔗 Links
-
-- **Website**: [Project Documentation](docs/index.html)
-- **Privacy Policy**: [Privacy Information](docs/privacy.html)
-- **User Guide**: [Usage Instructions](docs/usage.html)
-- **FAQ**: [Frequently Asked Questions](docs/faq.html)
-- **Changelog**: [Version History](docs/changelog.html)
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/BasiraQr/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/BasiraQr/discussions)
-- **Email**: support@basiraqr.com
-
----
 
 <div align="center">
   <strong>Built with ❤️ for user security and privacy</strong>
