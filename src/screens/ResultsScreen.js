@@ -10,16 +10,18 @@ import {
   Share,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLocale } from "../contexts/LocaleContext";
+import { useThemeMode } from "../contexts/ThemeContext";
 
-const SecurityBadge = ({ level }) => {
+const SecurityBadge = ({ level, theme }) => {
   const getBadgeStyle = (level) => {
     switch (level) {
       case "SAFE":
-        return { backgroundColor: "#4CAF50", icon: "✅" };
+        return { backgroundColor: theme.colors.success, icon: "✅" };
       case "SUSPICIOUS":
-        return { backgroundColor: "#FF9800", icon: "⚠️" };
+        return { backgroundColor: theme.colors.warning, icon: "⚠️" };
       case "MALICIOUS":
-        return { backgroundColor: "#F44336", icon: "🚨" };
+        return { backgroundColor: theme.colors.danger, icon: "🚨" };
       case "UNKNOWN":
         return { backgroundColor: "#9E9E9E", icon: "❓" };
       default:
@@ -40,34 +42,34 @@ const SecurityBadge = ({ level }) => {
 const ResultsScreen = ({ route, navigation }) => {
   const [showDetails, setShowDetails] = useState(false);
   const { scanResult } = route.params;
+  const { t } = useLocale();
+  const { theme } = useThemeMode();
 
   const getSecurityMessage = (level, positives, total) => {
     switch (level) {
       case "SAFE":
         return {
-          title: "Safe to Visit",
-          message: `This URL appears safe. No security vendors flagged it as malicious.`,
-          action: "You can safely open this link.",
+          title: t('results.safeToVisit'),
+          message: t('results.safeMessage'),
+          action: t('results.safeAction'),
         };
       case "SUSPICIOUS":
         return {
-          title: "Potentially Suspicious",
-          message: `${positives} out of ${total} security vendors flagged this URL. Exercise caution.`,
-          action:
-            "Consider avoiding this link or verify its authenticity first.",
+          title: t('results.suspiciousTitle'),
+          message: t('results.suspiciousMessage', { positives, total }),
+          action: t('results.suspiciousAction'),
         };
       case "MALICIOUS":
         return {
-          title: "Dangerous URL",
-          message: `${positives} out of ${total} security vendors flagged this as malicious.`,
-          action:
-            "Do not visit this link. It may harm your device or steal your data.",
+          title: t('results.maliciousTitle'),
+          message: t('results.maliciousMessage', { positives, total }),
+          action: t('results.maliciousAction'),
         };
       case "UNKNOWN":
         return {
-          title: "Unknown URL",
-          message: "This URL was not found in VirusTotal's database.",
-          action: "Proceed with caution. Consider the source before visiting.",
+          title: t('results.unknownTitle'),
+          message: t('results.unknownMessage'),
+          action: t('results.unknownAction'),
         };
       default:
         return {
@@ -87,12 +89,12 @@ const ResultsScreen = ({ route, navigation }) => {
   const handleOpenUrl = () => {
     if (scanResult.securityLevel === "MALICIOUS") {
       Alert.alert(
-        "Dangerous URL",
-        "This URL has been flagged as malicious. Are you sure you want to open it?",
+        t('errors.dangerousUrl'),
+        t('errors.dangerousUrlMessage'),
         [
-          { text: "Cancel", style: "cancel" },
+          { text: t('common.cancel'), style: "cancel" },
           {
-            text: "Open Anyway",
+            text: t('errors.openAnyway'),
             style: "destructive",
             onPress: () => Linking.openURL(scanResult.url),
           },
@@ -100,12 +102,12 @@ const ResultsScreen = ({ route, navigation }) => {
       );
     } else if (scanResult.securityLevel === "SUSPICIOUS") {
       Alert.alert(
-        "Suspicious URL",
-        "This URL has been flagged by some security vendors. Proceed with caution.",
+        t('errors.suspiciousUrl'),
+        t('errors.suspiciousUrlMessage'),
         [
-          { text: "Cancel", style: "cancel" },
+          { text: t('common.cancel'), style: "cancel" },
           {
-            text: "Open Carefully",
+            text: t('errors.openCarefully'),
             onPress: () => Linking.openURL(scanResult.url),
           },
         ]
@@ -117,17 +119,15 @@ const ResultsScreen = ({ route, navigation }) => {
 
   const handleShareResults = async () => {
     try {
-      const shareMessage = `BasiraQr Scan Results:
-URL: ${scanResult.url}
+      const shareMessage = `${t('app.name')} ${t('results.title')}:
+${t('results.urlInfo')}: ${scanResult.url}
 Security Status: ${scanResult.securityLevel}
-VirusTotal Score: ${scanResult.virusTotalReport.positives}/${
-        scanResult.virusTotalReport.total
-      }
+VirusTotal Score: ${scanResult.virusTotalReport.positives}/${scanResult.virusTotalReport.total}
 HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
 
       await Share.share({
         message: shareMessage,
-        title: "BasiraQr Scan Results",
+        title: `${t('app.name')} ${t('results.title')}`,
       });
     } catch (error) {
       console.error("Share failed:", error);
@@ -143,37 +143,51 @@ HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
     }
   };
 
+  const dynamicStyles = createDynamicStyles(theme);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {/* Main Security Status */}
-        <View style={styles.mainStatus}>
-          <SecurityBadge level={scanResult.securityLevel} />
-          <Text style={styles.statusTitle}>{securityInfo.title}</Text>
-          <Text style={styles.statusMessage}>{securityInfo.message}</Text>
+        <View style={[styles.mainStatus, { backgroundColor: theme.colors.card }]}>
+          <SecurityBadge level={scanResult.securityLevel} theme={theme} />
+          <Text style={[styles.statusTitle, { color: theme.colors.text }]}>
+            {securityInfo.title}
+          </Text>
+          <Text style={[styles.statusMessage, { color: theme.colors.textSecondary }]}>
+            {securityInfo.message}
+          </Text>
         </View>
 
         {/* URL Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📍 URL Information</Text>
-          <View style={styles.urlContainer}>
-            <Text style={styles.urlText} numberOfLines={3}>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            {t('results.urlInfo')}
+          </Text>
+          <View style={[styles.urlContainer, { backgroundColor: theme.colors.surface, borderLeftColor: theme.colors.primary }]}>
+            <Text style={[styles.urlText, { color: theme.colors.text }]} numberOfLines={3}>
               {scanResult.url}
             </Text>
             <View style={styles.urlDetails}>
               <View style={styles.urlDetailItem}>
-                <Text style={styles.urlDetailLabel}>Domain:</Text>
-                <Text style={styles.urlDetailValue}>{scanResult.domain}</Text>
+                <Text style={[styles.urlDetailLabel, { color: theme.colors.textSecondary }]}>
+                  {t('results.domain')}
+                </Text>
+                <Text style={[styles.urlDetailValue, { color: theme.colors.text }]}>
+                  {scanResult.domain}
+                </Text>
               </View>
               <View style={styles.urlDetailItem}>
-                <Text style={styles.urlDetailLabel}>Protocol:</Text>
+                <Text style={[styles.urlDetailLabel, { color: theme.colors.textSecondary }]}>
+                  {t('results.protocol')}
+                </Text>
                 <Text
                   style={[
                     styles.urlDetailValue,
-                    { color: scanResult.isHttps ? "#4CAF50" : "#FF9800" },
+                    { color: scanResult.isHttps ? theme.colors.success : theme.colors.warning },
                   ]}
                 >
                   {scanResult.isHttps ? "🔒 HTTPS" : "⚠️ HTTP"}
@@ -184,61 +198,75 @@ HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
         </View>
 
         {/* Security Analysis */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🛡️ Security Analysis</Text>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            {t('results.securityAnalysis')}
+          </Text>
           <View style={styles.analysisContainer}>
             <View style={styles.scoreContainer}>
-              <Text style={styles.scoreNumber}>
+              <Text style={[styles.scoreNumber, { color: theme.colors.text }]}>
                 {scanResult.virusTotalReport.positives}/
                 {scanResult.virusTotalReport.total}
               </Text>
-              <Text style={styles.scoreLabel}>
-                Security vendors flagged this URL
+              <Text style={[styles.scoreLabel, { color: theme.colors.textSecondary }]}>
+                {t('results.vendorsFlagged')}
               </Text>
             </View>
 
             {!scanResult.isHttps && (
-              <View style={styles.warningContainer}>
+              <View style={[styles.warningContainer, { backgroundColor: '#fff3cd', borderLeftColor: theme.colors.warning }]}>
                 <Text style={styles.warningText}>
-                  ⚠️ This URL uses HTTP instead of HTTPS, making it less secure
+                  {t('results.httpWarning')}
                 </Text>
               </View>
             )}
 
-            <Text style={styles.actionText}>{securityInfo.action}</Text>
+            <Text style={[styles.actionText, { color: theme.colors.text }]}>
+              {securityInfo.action}
+            </Text>
           </View>
         </View>
 
         {/* Detailed Report */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
           <TouchableOpacity
             style={styles.detailsToggle}
             onPress={() => setShowDetails(!showDetails)}
           >
-            <Text style={styles.sectionTitle}>📊 Detailed Report</Text>
-            <Text style={styles.toggleIcon}>{showDetails ? "▼" : "▶"}</Text>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+              {t('results.detailedReport')}
+            </Text>
+            <Text style={[styles.toggleIcon, { color: theme.colors.textSecondary }]}>
+              {showDetails ? "▼" : "▶"}
+            </Text>
           </TouchableOpacity>
 
           {showDetails && (
-            <View style={styles.detailsContainer}>
+            <View style={[styles.detailsContainer, { borderTopColor: theme.colors.divider }]}>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Scan Date:</Text>
-                <Text style={styles.detailValue}>
+                <Text style={[styles.detailLabel, { color: theme.colors.textSecondary }]}>
+                  {t('results.scanDate')}
+                </Text>
+                <Text style={[styles.detailValue, { color: theme.colors.text }]}>
                   {formatDate(scanResult.virusTotalReport.scanDate)}
                 </Text>
               </View>
 
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Response Code:</Text>
-                <Text style={styles.detailValue}>
+                <Text style={[styles.detailLabel, { color: theme.colors.textSecondary }]}>
+                  {t('results.responseCode')}
+                </Text>
+                <Text style={[styles.detailValue, { color: theme.colors.text }]}>
                   {scanResult.virusTotalReport.responseCode}
                 </Text>
               </View>
 
               {scanResult.virusTotalReport.message && (
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>VirusTotal Message:</Text>
-                  <Text style={styles.detailValue}>
+                  <Text style={[styles.detailLabel, { color: theme.colors.textSecondary }]}>
+                    {t('results.vtMessage')}
+                  </Text>
+                  <Text style={[styles.detailValue, { color: theme.colors.text }]}>
                     {scanResult.virusTotalReport.message}
                   </Text>
                 </View>
@@ -246,38 +274,39 @@ HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
 
               {scanResult.virusTotalReport.permalink && (
                 <TouchableOpacity
-                  style={styles.permalinkButton}
+                  style={[styles.permalinkButton, { backgroundColor: theme.colors.primary }]}
                   onPress={() =>
                     Linking.openURL(scanResult.virusTotalReport.permalink)
                   }
                 >
                   <Text style={styles.permalinkText}>
-                    View Full Report on VirusTotal
+                    {t('results.viewFullReport')}
                   </Text>
                 </TouchableOpacity>
               )}
 
               {/* Vendor Results */}
-              {Object.keys(scanResult.virusTotalReport.scans || {}).length >
-                0 && (
+              {Object.keys(scanResult.virusTotalReport.scans || {}).length > 0 && (
                 <View style={styles.vendorResults}>
-                  <Text style={styles.vendorTitle}>
-                    Security Vendor Results:
+                  <Text style={[styles.vendorTitle, { color: theme.colors.text }]}>
+                    {t('results.vendorResults')}
                   </Text>
                   {Object.entries(scanResult.virusTotalReport.scans)
-                    .slice(0, 10) // Show first 10 vendors
+                    .slice(0, 10)
                     .map(([vendor, result]) => (
-                      <View key={vendor} style={styles.vendorRow}>
-                        <Text style={styles.vendorName}>{vendor}</Text>
+                      <View key={vendor} style={[styles.vendorRow, { borderBottomColor: theme.colors.divider }]}>
+                        <Text style={[styles.vendorName, { color: theme.colors.text }]}>
+                          {vendor}
+                        </Text>
                         <Text
                           style={[
                             styles.vendorResult,
-                            { color: result.detected ? "#F44336" : "#4CAF50" },
+                            { color: result.detected ? theme.colors.danger : theme.colors.success },
                           ]}
                         >
                           {result.detected
-                            ? result.result || "Malicious"
-                            : "Clean"}
+                            ? result.result || t('results.malicious')
+                            : t('results.clean')}
                         </Text>
                       </View>
                     ))}
@@ -291,46 +320,50 @@ HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
         <View style={styles.actionButtons}>
           {scanResult.securityLevel === "SAFE" ? (
             <TouchableOpacity
-              style={[styles.actionButton, styles.safeButton]}
+              style={[styles.actionButton, { backgroundColor: theme.colors.success }]}
               onPress={handleOpenUrl}
             >
-              <Text style={styles.actionButtonText}>🌐 Open Safely</Text>
+              <Text style={styles.actionButtonText}>{t('results.openSafely')}</Text>
             </TouchableOpacity>
           ) : scanResult.securityLevel === "SUSPICIOUS" ? (
             <TouchableOpacity
-              style={[styles.actionButton, styles.cautionButton]}
+              style={[styles.actionButton, { backgroundColor: theme.colors.warning }]}
               onPress={handleOpenUrl}
             >
-              <Text style={styles.actionButtonText}>⚠️ Open with Caution</Text>
+              <Text style={styles.actionButtonText}>{t('results.openCaution')}</Text>
             </TouchableOpacity>
           ) : scanResult.securityLevel === "MALICIOUS" ? (
             <TouchableOpacity
-              style={[styles.actionButton, styles.dangerButton]}
+              style={[styles.actionButton, { backgroundColor: theme.colors.danger }]}
               onPress={handleOpenUrl}
             >
-              <Text style={styles.actionButtonText}>🚨 Do Not Open</Text>
+              <Text style={styles.actionButtonText}>{t('results.doNotOpen')}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              style={[styles.actionButton, styles.unknownButton]}
+              style={[styles.actionButton, { backgroundColor: "#9E9E9E" }]}
               onPress={handleOpenUrl}
             >
-              <Text style={styles.actionButtonText}>❓ Open at Own Risk</Text>
+              <Text style={styles.actionButtonText}>{t('results.openOwnRisk')}</Text>
             </TouchableOpacity>
           )}
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
+            style={[styles.actionButton, styles.secondaryButton, { borderColor: theme.colors.primary }]}
             onPress={handleShareResults}
           >
-            <Text style={styles.secondaryButtonText}>📤 Share Results</Text>
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
+              {t('results.share')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
+            style={[styles.actionButton, styles.secondaryButton, { borderColor: theme.colors.primary }]}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.secondaryButtonText}>🔄 Scan Another</Text>
+            <Text style={[styles.secondaryButtonText, { color: theme.colors.primary }]}>
+              {t('results.scanAnother')}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -338,17 +371,19 @@ HTTPS: ${scanResult.isHttps ? "Yes" : "No"}`;
   );
 };
 
+const createDynamicStyles = (theme) => StyleSheet.create({
+  // Dynamic styles based on theme
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flex: 1,
     padding: 20,
   },
   mainStatus: {
-    backgroundColor: "#fff",
     borderRadius: 15,
     padding: 25,
     alignItems: "center",
@@ -379,18 +414,15 @@ const styles = StyleSheet.create({
   statusTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
     textAlign: "center",
   },
   statusMessage: {
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
     lineHeight: 24,
   },
   section: {
-    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
     marginBottom: 15,
@@ -403,19 +435,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 15,
   },
   urlContainer: {
-    backgroundColor: "#f8f9fa",
     padding: 15,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#2196F3",
   },
   urlText: {
     fontSize: 16,
-    color: "#333",
     marginBottom: 10,
     fontFamily: "monospace",
   },
@@ -430,12 +458,10 @@ const styles = StyleSheet.create({
   },
   urlDetailLabel: {
     fontSize: 14,
-    color: "#666",
     fontWeight: "bold",
   },
   urlDetailValue: {
     fontSize: 14,
-    color: "#333",
   },
   analysisContainer: {
     alignItems: "center",
@@ -447,20 +473,16 @@ const styles = StyleSheet.create({
   scoreNumber: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#333",
   },
   scoreLabel: {
     fontSize: 14,
-    color: "#666",
     textAlign: "center",
     marginTop: 5,
   },
   warningContainer: {
-    backgroundColor: "#fff3cd",
     padding: 10,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#ffc107",
     marginBottom: 15,
     width: "100%",
   },
@@ -470,7 +492,6 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    color: "#333",
     textAlign: "center",
     lineHeight: 24,
     fontStyle: "italic",
@@ -483,11 +504,9 @@ const styles = StyleSheet.create({
   },
   toggleIcon: {
     fontSize: 18,
-    color: "#666",
   },
   detailsContainer: {
     borderTopWidth: 1,
-    borderTopColor: "#eee",
     paddingTop: 15,
   },
   detailRow: {
@@ -497,18 +516,15 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    color: "#666",
     fontWeight: "bold",
     flex: 1,
   },
   detailValue: {
     fontSize: 14,
-    color: "#333",
     flex: 2,
     textAlign: "right",
   },
   permalinkButton: {
-    backgroundColor: "#2196F3",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -525,7 +541,6 @@ const styles = StyleSheet.create({
   vendorTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
   },
   vendorRow: {
@@ -534,11 +549,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 5,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   vendorName: {
     fontSize: 14,
-    color: "#333",
     flex: 1,
   },
   vendorResult: {
@@ -556,22 +569,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  safeButton: {
-    backgroundColor: "#4CAF50",
-  },
-  cautionButton: {
-    backgroundColor: "#FF9800",
-  },
-  dangerButton: {
-    backgroundColor: "#F44336",
-  },
-  unknownButton: {
-    backgroundColor: "#9E9E9E",
-  },
   secondaryButton: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#2196F3",
   },
   actionButtonText: {
     color: "#fff",
@@ -579,7 +579,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   secondaryButtonText: {
-    color: "#2196F3",
     fontSize: 16,
     fontWeight: "bold",
   },

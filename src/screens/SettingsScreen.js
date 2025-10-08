@@ -12,11 +12,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "../contexts/AppContext";
+import { useLocale } from "../contexts/LocaleContext";
+import { useThemeMode } from "../contexts/ThemeContext";
 import StorageService from "../services/StorageService";
 import VirusTotalService from "../services/VirusTotalService";
 
 const SettingsScreen = ({ navigation }) => {
   const { state, actions } = useApp();
+  const { t, locale, changeLocale } = useLocale();
+  const { theme, mode, setMode } = useThemeMode();
+  
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [newApiKey, setNewApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
@@ -36,7 +41,7 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleChangeApiKey = async () => {
     if (!newApiKey.trim()) {
-      Alert.alert("Error", "Please enter a valid API key");
+      Alert.alert(t('errors.error'), t('errors.enterValidKey'));
       return;
     }
 
@@ -50,12 +55,12 @@ const SettingsScreen = ({ navigation }) => {
         await actions.setApiKey(newApiKey.trim());
         setShowApiKeyModal(false);
         setNewApiKey("");
-        Alert.alert("Success", "API key updated successfully!");
+        Alert.alert(t('errors.success'), t('errors.apiKeyUpdated'));
       } else {
-        Alert.alert("Invalid API Key", "The API key you entered is not valid.");
+        Alert.alert(t('errors.invalidApiKey'), t('errors.invalidApiKeyMessage'));
       }
     } catch (error) {
-      Alert.alert("Validation Failed", "Failed to validate the new API key.");
+      Alert.alert(t('errors.validationFailed'), t('errors.validationFailedMessage'));
     } finally {
       setIsValidating(false);
     }
@@ -63,23 +68,23 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleRemoveApiKey = () => {
     Alert.alert(
-      "Remove API Key",
-      "Are you sure you want to remove your API key? You will need to set it up again to use the app.",
+      t('errors.removeApiKeyTitle'),
+      t('errors.removeApiKeyMessage'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('common.cancel'), style: "cancel" },
         {
-          text: "Remove",
+          text: t('settings.removeKey'),
           style: "destructive",
           onPress: async () => {
             try {
               await StorageService.removeApiKey();
               Alert.alert(
-                "API Key Removed",
-                "You will be redirected to the setup screen.",
-                [{ text: "OK", onPress: () => navigation.replace("Setup") }]
+                t('errors.apiKeyRemoved'),
+                t('errors.apiKeyRemovedMessage'),
+                [{ text: t('common.ok'), onPress: () => navigation.replace("Setup") }]
               );
             } catch (error) {
-              Alert.alert("Error", "Failed to remove API key");
+              Alert.alert(t('errors.error'), t('errors.failedToRemove'));
             }
           },
         },
@@ -89,16 +94,15 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleClearHistory = () => {
     Alert.alert(
-      "Clear Scan History",
-      "Are you sure you want to clear all scan history?",
+      t('errors.clearHistoryTitle'),
+      t('errors.clearHistoryMessage'),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t('common.cancel'), style: "cancel" },
         {
-          text: "Clear",
+          text: t('settings.clearHistory'),
           style: "destructive",
           onPress: () => {
-            // This would require implementing a clear history action in the context
-            Alert.alert("Success", "Scan history cleared");
+            Alert.alert(t('errors.success'), t('errors.successMessage'));
           },
         },
       ]
@@ -113,121 +117,248 @@ const SettingsScreen = ({ navigation }) => {
     danger = false,
   }) => (
     <TouchableOpacity
-      style={styles.settingItem}
+      style={[styles.settingItem, { borderBottomColor: theme.colors.divider }]}
       onPress={onPress}
       disabled={!onPress}
     >
       <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, danger && styles.dangerText]}>
+        <Text style={[
+          styles.settingTitle,
+          { color: danger ? theme.colors.danger : theme.colors.text }
+        ]}>
           {title}
         </Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+        {subtitle && (
+          <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+            {subtitle}
+          </Text>
+        )}
       </View>
       {rightElement && <View style={styles.settingRight}>{rightElement}</View>}
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView style={styles.scrollView}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Settings</Text>
+        <View style={[styles.header, { backgroundColor: theme.colors.primary }]}>
+          <Text style={styles.headerTitle}>{t('settings.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            Manage your BasiraQr preferences
+            {t('settings.subtitle')}
           </Text>
         </View>
 
+        {/* Appearance Section */}
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
+            {t('settings.appearance')}
+          </Text>
+
+          {/* Language Selector */}
+          <View style={[styles.settingItem, { borderBottomColor: theme.colors.divider }]}>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
+                {t('settings.language')}
+              </Text>
+              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+                {t('settings.languageSubtitle')}
+              </Text>
+            </View>
+            <View style={styles.languageSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.languageButton,
+                  locale === 'en' && { backgroundColor: theme.colors.primary },
+                  { borderColor: theme.colors.border }
+                ]}
+                onPress={() => changeLocale('en')}
+              >
+                <Text style={[
+                  styles.languageButtonText,
+                  { color: locale === 'en' ? '#fff' : theme.colors.text }
+                ]}>
+                  {t('settings.english')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.languageButton,
+                  locale === 'ar' && { backgroundColor: theme.colors.primary },
+                  { borderColor: theme.colors.border }
+                ]}
+                onPress={() => changeLocale('ar')}
+              >
+                <Text style={[
+                  styles.languageButtonText,
+                  { color: locale === 'ar' ? '#fff' : theme.colors.text }
+                ]}>
+                  {t('settings.arabic')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Dark Mode Selector */}
+          <View style={[styles.settingItem, { borderBottomColor: theme.colors.divider }]}>
+            <View style={styles.settingContent}>
+              <Text style={[styles.settingTitle, { color: theme.colors.text }]}>
+                {t('settings.darkMode')}
+              </Text>
+              <Text style={[styles.settingSubtitle, { color: theme.colors.textSecondary }]}>
+                {t('settings.darkModeSubtitle')}
+              </Text>
+            </View>
+            <View style={styles.themeSelector}>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  mode === 'light' && { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={() => setMode('light')}
+              >
+                <Text style={[
+                  styles.themeButtonText,
+                  { color: mode === 'light' ? '#fff' : theme.colors.text }
+                ]}>
+                  ☀️
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  mode === 'system' && { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={() => setMode('system')}
+              >
+                <Text style={[
+                  styles.themeButtonText,
+                  { color: mode === 'system' ? '#fff' : theme.colors.text }
+                ]}>
+                  ⚙️
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.themeButton,
+                  mode === 'dark' && { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={() => setMode('dark')}
+              >
+                <Text style={[
+                  styles.themeButtonText,
+                  { color: mode === 'dark' ? '#fff' : theme.colors.text }
+                ]}>
+                  🌙
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
         {/* API Key Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🔑 VirusTotal Integration</Text>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
+            {t('settings.vtIntegration')}
+          </Text>
 
           <SettingItem
-            title="API Key"
-            subtitle={`Current: ${maskedApiKey || "Not set"}`}
+            title={t('settings.apiKey')}
+            subtitle={t('settings.currentKey', { key: maskedApiKey || t('settings.notSet') })}
             onPress={() => setShowApiKeyModal(true)}
-            rightElement={<Text style={styles.editText}>Edit</Text>}
+            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.edit')}</Text>}
           />
 
           <SettingItem
-            title="Remove API Key"
-            subtitle="Remove current API key and reset app"
+            title={t('settings.removeKey')}
+            subtitle={t('settings.removeKeySubtitle')}
             onPress={handleRemoveApiKey}
             danger={true}
           />
         </View>
 
         {/* Scan History Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Scan History</Text>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
+            {t('settings.scanHistory')}
+          </Text>
 
           <SettingItem
-            title="Total Scans"
-            subtitle={`${state.scanHistory.length} QR codes scanned`}
+            title={t('settings.totalScans')}
+            subtitle={t('settings.scansCount', { count: state.scanHistory.length })}
             rightElement={
-              <Text style={styles.countText}>{state.scanHistory.length}</Text>
+              <Text style={[styles.countText, { color: theme.colors.textSecondary }]}>
+                {state.scanHistory.length}
+              </Text>
             }
           />
 
           <SettingItem
-            title="Clear History"
-            subtitle="Remove all scan records"
+            title={t('settings.clearHistory')}
+            subtitle={t('settings.clearHistorySubtitle')}
             onPress={handleClearHistory}
             danger={true}
           />
         </View>
 
         {/* Security Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🛡️ Security Settings</Text>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
+            {t('settings.securitySettings')}
+          </Text>
 
           <SettingItem
-            title="HTTPS Warning"
-            subtitle="Always warn about HTTP (non-secure) links"
-            rightElement={<Text style={styles.statusText}>Enabled</Text>}
+            title={t('settings.httpsWarning')}
+            subtitle={t('settings.httpsWarningSubtitle')}
+            rightElement={<Text style={[styles.statusText, { color: theme.colors.success }]}>{t('settings.enabled')}</Text>}
           />
 
           <SettingItem
-            title="Auto-block Malicious"
-            subtitle="Prevent opening URLs flagged as malicious"
-            rightElement={<Text style={styles.statusText}>Enabled</Text>}
+            title={t('settings.autoBlock')}
+            subtitle={t('settings.autoBlockSubtitle')}
+            rightElement={<Text style={[styles.statusText, { color: theme.colors.success }]}>{t('settings.enabled')}</Text>}
           />
         </View>
 
         {/* App Info Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ℹ️ App Information</Text>
+        <View style={[styles.section, { backgroundColor: theme.colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, backgroundColor: theme.colors.surface }]}>
+            {t('settings.appInfo')}
+          </Text>
 
-          <SettingItem title="Version" subtitle="BasiraQr v1.0.0" />
-
-          <SettingItem
-            title="Privacy Policy"
-            subtitle="View our privacy practices"
-            onPress={() => {
-              Alert.alert(
-                "Privacy Policy",
-                "BasiraQr :\n\n• Stores your API key securely on device\n• Sends scanned URLs to VirusTotal for analysis\n• Does not collect personal data\n• Scan history stays on your device"
-              );
-            }}
-            rightElement={<Text style={styles.editText}>View</Text>}
+          <SettingItem 
+            title={t('settings.version')} 
+            subtitle={t('settings.versionNumber')} 
           />
 
           <SettingItem
-            title="About VirusTotal"
-            subtitle="Learn about our security partner"
+            title={t('settings.privacyPolicy')}
+            subtitle={t('settings.privacyPolicySubtitle')}
             onPress={() => {
               Alert.alert(
-                "About VirusTotal",
-                "VirusTotal is a free online service that analyzes URLs and files for malicious content using multiple antivirus engines and security tools."
+                t('errors.privacyPolicyTitle'),
+                t('errors.privacyPolicyMessage')
               );
             }}
-            rightElement={<Text style={styles.editText}>Info</Text>}
+            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.view')}</Text>}
+          />
+
+          <SettingItem
+            title={t('settings.aboutVT')}
+            subtitle={t('settings.aboutVTSubtitle')}
+            onPress={() => {
+              Alert.alert(
+                t('errors.aboutVTTitle'),
+                t('errors.aboutVTMessage')
+              );
+            }}
+            rightElement={<Text style={[styles.editText, { color: theme.colors.primary }]}>{t('common.info')}</Text>}
           />
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Made with ❤️ for safer QR code scanning
+          <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
+            {t('settings.madeWith')}
           </Text>
         </View>
       </ScrollView>
@@ -238,17 +369,21 @@ const SettingsScreen = ({ navigation }) => {
         animationType="slide"
         presentationStyle="pageSheet"
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: theme.colors.card }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.colors.divider }]}>
             <TouchableOpacity
               onPress={() => {
                 setShowApiKeyModal(false);
                 setNewApiKey("");
               }}
             >
-              <Text style={styles.cancelButton}>Cancel</Text>
+              <Text style={[styles.cancelButton, { color: theme.colors.textSecondary }]}>
+                {t('common.cancel')}
+              </Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Change API Key</Text>
+            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>
+              {t('settings.changeApiKey')}
+            </Text>
             <TouchableOpacity
               onPress={handleChangeApiKey}
               disabled={!newApiKey.trim() || isValidating}
@@ -256,24 +391,31 @@ const SettingsScreen = ({ navigation }) => {
               <Text
                 style={[
                   styles.saveButton,
-                  (!newApiKey.trim() || isValidating) &&
-                    styles.saveButtonDisabled,
+                  { color: theme.colors.primary },
+                  (!newApiKey.trim() || isValidating) && { color: theme.colors.disabled },
                 ]}
               >
-                {isValidating ? "Validating..." : "Save"}
+                {isValidating ? t('settings.validating') : t('common.save')}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.modalContent}>
-            <Text style={styles.modalDescription}>
-              Enter your new VirusTotal API key. The key will be validated
-              before saving.
+            <Text style={[styles.modalDescription, { color: theme.colors.textSecondary }]}>
+              {t('settings.enterNewKey')}
             </Text>
 
             <TextInput
-              style={styles.apiKeyInput}
-              placeholder="Paste your new VirusTotal API key here"
+              style={[
+                styles.apiKeyInput,
+                {
+                  borderColor: theme.colors.border,
+                  color: theme.colors.text,
+                  backgroundColor: theme.colors.surface,
+                }
+              ]}
+              placeholder={t('settings.pasteKey')}
+              placeholderTextColor={theme.colors.textMuted}
               value={newApiKey}
               onChangeText={setNewApiKey}
               multiline
@@ -283,23 +425,30 @@ const SettingsScreen = ({ navigation }) => {
 
             {isValidating && (
               <View style={styles.validatingContainer}>
-                <ActivityIndicator size="small" color="#2196F3" />
-                <Text style={styles.validatingText}>Validating API key...</Text>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={[styles.validatingText, { color: theme.colors.textSecondary }]}>
+                  {t('settings.validating')}
+                </Text>
               </View>
             )}
 
             <TouchableOpacity
-              style={styles.getKeyButton}
+              style={[
+                styles.getKeyButton,
+                {
+                  backgroundColor: theme.colors.surface,
+                  borderColor: theme.colors.border,
+                }
+              ]}
               onPress={() => {
-                // This would open the VirusTotal signup page
                 Alert.alert(
-                  "Get API Key",
-                  "Visit virustotal.com to create a free account and get your API key."
+                  t('errors.getApiKeyTitle'),
+                  t('errors.getApiKeyMessage')
                 );
               }}
             >
-              <Text style={styles.getKeyButtonText}>
-                Don't have an API key? Get one free
+              <Text style={[styles.getKeyButtonText, { color: theme.colors.primary }]}>
+                {t('settings.getKeyFree')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -312,14 +461,12 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   scrollView: {
     flex: 1,
   },
   header: {
     padding: 20,
-    backgroundColor: "#2196F3",
     alignItems: "center",
   },
   headerTitle: {
@@ -334,17 +481,14 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   section: {
-    backgroundColor: "#fff",
     marginTop: 15,
     paddingVertical: 10,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: "#f8f9fa",
   },
   settingItem: {
     flexDirection: "row",
@@ -352,7 +496,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   settingContent: {
     flex: 1,
@@ -360,33 +503,55 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#333",
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 14,
-    color: "#666",
   },
   settingRight: {
     marginLeft: 10,
   },
   editText: {
-    color: "#2196F3",
     fontSize: 16,
     fontWeight: "500",
   },
   countText: {
-    color: "#666",
     fontSize: 16,
     fontWeight: "bold",
   },
   statusText: {
-    color: "#4CAF50",
     fontSize: 14,
     fontWeight: "500",
   },
-  dangerText: {
-    color: "#F44336",
+  languageSelector: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  languageButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  languageButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  themeSelector: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  themeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  themeButtonText: {
+    fontSize: 20,
   },
   footer: {
     padding: 20,
@@ -394,14 +559,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footerText: {
-    color: "#666",
     fontSize: 14,
     fontStyle: "italic",
   },
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   modalHeader: {
     flexDirection: "row",
@@ -410,24 +573,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
   },
   cancelButton: {
-    color: "#666",
     fontSize: 16,
   },
   saveButton: {
-    color: "#2196F3",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  saveButtonDisabled: {
-    color: "#ccc",
   },
   modalContent: {
     flex: 1,
@@ -435,13 +591,11 @@ const styles = StyleSheet.create({
   },
   modalDescription: {
     fontSize: 16,
-    color: "#666",
     marginBottom: 20,
     lineHeight: 24,
   },
   apiKeyInput: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     padding: 15,
     fontSize: 16,
@@ -457,19 +611,15 @@ const styles = StyleSheet.create({
   },
   validatingText: {
     marginLeft: 10,
-    color: "#666",
     fontSize: 16,
   },
   getKeyButton: {
-    backgroundColor: "#f8f9fa",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
   },
   getKeyButtonText: {
-    color: "#2196F3",
     fontSize: 16,
     fontWeight: "500",
   },

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
@@ -11,8 +10,12 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "../contexts/AppContext";
+import { useLocale } from "../contexts/LocaleContext";
+import { useThemeMode } from "../contexts/ThemeContext";
 import { UrlValidator } from "../services/UrlValidator";
 import VirusTotalService from "../services/VirusTotalService";
+import ScanningLoader from "../components/ScanningLoader";
+import Toast from "../components/Toast";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,7 +23,12 @@ const ScannerScreen = ({ navigation }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [scanStage, setScanStage] = useState(null); // 'scanning' | 'analyzing' | 'queued'
+  const [toast, setToast] = useState(null);
+  
   const { state, actions } = useApp();
+  const { t } = useLocale();
+  const { theme } = useThemeMode();
   const vtService = useRef(new VirusTotalService());
 
   useEffect(() => {
@@ -29,11 +37,20 @@ const ScannerScreen = ({ navigation }) => {
     }
   }, [state.apiKey]);
 
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type });
+  };
+
+  const hideToast = () => {
+    setToast(null);
+  };
+
   const handleBarCodeScanned = async ({ type, data }) => {
     if (scanned || isProcessing) return;
 
     setScanned(true);
     setIsProcessing(true);
+    setScanStage('scanning');
 
     try {
       console.log("📱 QR Code scanned:", { type, data });
@@ -41,11 +58,11 @@ const ScannerScreen = ({ navigation }) => {
       // Check if the scanned data is a URL
       if (!UrlValidator.isValidUrl(data)) {
         console.log("❌ Scanned content is not a valid URL");
-        Alert.alert(
-          "Not a URL",
-          `Scanned content: ${data}\n\nThis QR code doesn't contain a URL.`,
-          [{ text: "Scan Again", onPress: () => setScanned(false) }]
-        );
+        setScanStage(null);
+        showToast(t('errors.notUrlMessage', { data: data.substring(0, 50) }), 'error');
+        setTimeout(() => {
+          resetScanner();
+        }, 3000);
         return;
       }
 
@@ -58,8 +75,8 @@ const ScannerScreen = ({ navigation }) => {
         isHttps: isHttps,
       });
 
-      // Show processing indicator
-      actions.setLoading(true);
+      // Show analyzing stage
+      setScanStage('analyzing');
 
       // Scan with VirusTotal
       console.log("🛡️ Starting VirusTotal scan...");
@@ -84,24 +101,35 @@ const ScannerScreen = ({ navigation }) => {
       // Add to history
       actions.addScanResult(scanResult);
 
+      // Clear loading state
+      setScanStage(null);
+
       // Navigate to results
       navigation.navigate("Results", { scanResult });
     } catch (error) {
       console.error("Scan processing error:", error);
-      Alert.alert(
-        "Scan Error",
-        error.message || "Failed to process the QR code. Please try again.",
-        [{ text: "Try Again", onPress: () => resetScanner() }]
-      );
+      setScanStage(null);
+      
+      if (error.message === "QUEUED") {
+        showToast(t('scanner.queued'), 'warning');
+        setTimeout(() => {
+          resetScanner();
+        }, 3000);
+      } else {
+        showToast(error.message || t('errors.scanErrorMessage'), 'error');
+        setTimeout(() => {
+          resetScanner();
+        }, 3000);
+      }
     } finally {
       setIsProcessing(false);
-      actions.setLoading(false);
     }
   };
 
   const resetScanner = () => {
     setScanned(false);
     setIsProcessing(false);
+    setScanStage(null);
   };
 
   // Reset scanner when screen comes into focus
@@ -124,26 +152,30 @@ const ScannerScreen = ({ navigation }) => {
 
   if (!permission) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2196F3" />
-        <Text style={styles.loadingText}>Requesting camera permission...</Text>
+      <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={[styles.loadingText, { color: theme.colors.textSecondary }]}>
+          {t('scanner.requestingPermission')}
+        </Text>
       </View>
     );
   }
 
   if (!permission.granted) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
         <Text style={styles.errorText}>📷</Text>
-        <Text style={styles.errorTitle}>Camera Permission Required</Text>
-        <Text style={styles.errorMessage}>
-          BasiraQr needs camera access to scan QR codes.
+        <Text style={[styles.errorTitle, { color: theme.colors.text }]}>
+          {t('scanner.cameraRequired')}
+        </Text>
+        <Text style={[styles.errorMessage, { color: theme.colors.textSecondary }]}>
+          {t('scanner.cameraMsg')}
         </Text>
         <TouchableOpacity
-          style={styles.retryButton}
+          style={[styles.retryButton, { backgroundColor: theme.colors.primary }]}
           onPress={requestPermission}
         >
-          <Text style={styles.retryButtonText}>Grant Permission</Text>
+          <Text style={styles.retryButtonText}>{t('scanner.grantPermission')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -160,39 +192,20 @@ const ScannerScreen = ({ navigation }) => {
         }}
       >
         <View style={styles.overlay}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.settingsButton}
-              onPress={() => navigation.navigate("Settings")}
-            >
-              <Text style={styles.settingsButtonText}>⚙️ Settings</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Scanning area */}
           <View style={styles.scanningArea}>
             <View style={styles.scanFrame}>
-              <View style={[styles.corner, styles.topLeft]} />
-              <View style={[styles.corner, styles.topRight]} />
-              <View style={[styles.corner, styles.bottomLeft]} />
-              <View style={[styles.corner, styles.bottomRight]} />
+              <View style={[styles.corner, styles.topLeft, { borderColor: theme.colors.scanFrame }]} />
+              <View style={[styles.corner, styles.topRight, { borderColor: theme.colors.scanFrame }]} />
+              <View style={[styles.corner, styles.bottomLeft, { borderColor: theme.colors.scanFrame }]} />
+              <View style={[styles.corner, styles.bottomRight, { borderColor: theme.colors.scanFrame }]} />
             </View>
 
-            {isProcessing && (
-              <View style={styles.processingOverlay}>
-                <ActivityIndicator size="large" color="#fff" />
-                <Text style={styles.processingText}>
-                  Checking URL security...
-                </Text>
-              </View>
-            )}
-
             {scanned && !isProcessing && (
-              <View style={styles.scanCompleteOverlay}>
-                <Text style={styles.scanCompleteText}>✅ Scan Complete</Text>
+              <View style={[styles.scanCompleteOverlay, { backgroundColor: 'rgba(76, 175, 80, 0.9)' }]}>
+                <Text style={styles.scanCompleteText}>✅ {t('scanner.complete')}</Text>
                 <Text style={styles.scanCompleteSubtext}>
-                  Tap "Scan Again" to scan another QR code
+                  {t('scanner.tapScanAgain')}
                 </Text>
               </View>
             )}
@@ -202,22 +215,22 @@ const ScannerScreen = ({ navigation }) => {
           <View style={styles.instructions}>
             {!scanned ? (
               <>
-                <Text style={styles.instructionTitle}>🛡️ BasiraQr Active</Text>
+                <Text style={styles.instructionTitle}>{t('scanner.active')}</Text>
                 <Text style={styles.instructionText}>
-                  Point your camera at a QR code to scan it safely
+                  {t('scanner.pointCamera')}
                 </Text>
               </>
             ) : (
               <>
                 <Text style={styles.instructionTitle}>
-                  {isProcessing ? "Processing..." : "Scan Complete"}
+                  {isProcessing ? t('scanner.processing') : t('scanner.complete')}
                 </Text>
                 <TouchableOpacity
-                  style={styles.cancelButton}
+                  style={[styles.cancelButton, { backgroundColor: theme.colors.danger }]}
                   onPress={resetScanner}
                 >
                   <Text style={styles.cancelButtonText}>
-                    {isProcessing ? "Cancel" : "Scan Again"}
+                    {isProcessing ? t('common.cancel') : t('common.scanAgain')}
                   </Text>
                 </TouchableOpacity>
               </>
@@ -228,12 +241,33 @@ const ScannerScreen = ({ navigation }) => {
           {state.scanHistory.length > 0 && (
             <View style={styles.historyIndicator}>
               <Text style={styles.historyText}>
-                📊 {state.scanHistory.length} scans in history
+                📊 {t('scanner.scansInHistory', { count: state.scanHistory.length })}
               </Text>
             </View>
           )}
+
+          {/* Floating Settings Button - Top Right */}
+          <TouchableOpacity
+            style={[styles.floatingSettingsButton, { backgroundColor: theme.colors.primary }]}
+            onPress={() => navigation.navigate('Settings')}
+          >
+            <Text style={styles.floatingSettingsIcon}>⚙️</Text>
+          </TouchableOpacity>
         </View>
       </CameraView>
+
+      {/* Loading Overlay */}
+      {scanStage && <ScanningLoader stage={scanStage} />}
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          duration={3000}
+          onHide={hideToast}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -246,7 +280,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
     padding: 20,
   },
   camera: {
@@ -255,23 +288,6 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "transparent",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    padding: 20,
-    paddingTop: 10,
-  },
-  settingsButton: {
-    backgroundColor: "rgba(0,0,0,0.7)",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  settingsButtonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
   },
   scanningArea: {
     flex: 1,
@@ -287,7 +303,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 30,
     height: 30,
-    borderColor: "#2196F3",
     borderWidth: 4,
   },
   topLeft: {
@@ -314,30 +329,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderLeftWidth: 0,
   },
-  processingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.8)",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  processingText: {
-    color: "#fff",
-    fontSize: 16,
-    marginTop: 10,
-    textAlign: "center",
-  },
   scanCompleteOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(76, 175, 80, 0.9)",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -378,7 +375,6 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   cancelButton: {
-    backgroundColor: "#f44336",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -402,10 +398,27 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
   },
+  floatingSettingsButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+  },
+  floatingSettingsIcon: {
+    fontSize: 24,
+  },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: "#666",
   },
   errorText: {
     fontSize: 48,
@@ -414,18 +427,15 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
     textAlign: "center",
   },
   errorMessage: {
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: "#2196F3",
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

@@ -56,7 +56,7 @@ export default function App() {
                 initialRouteName={isSetupComplete ? "Scanner" : "Setup"}
                 screenOptions={{
                   headerStyle: {
-                    backgroundColor: "#2196F3",
+                    backgroundColor: "#6366F1",
                   },
                   headerTintColor: "#fff",
                   headerTitleStyle: {

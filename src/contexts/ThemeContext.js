@@ -41,37 +41,48 @@ export const ThemeProvider = ({ children }) => {
       dark: isDark,
       colors: {
         // Backgrounds
-        background: isDark ? "#121212" : "#f5f5f5",
-        card: isDark ? "#1e1e1e" : "#fff",
-        surface: isDark ? "#2a2a2a" : "#ffffff",
+        background: isDark ? "#0F172A" : "#F8FAFC",
+        card: isDark ? "#1E293B" : "#FFFFFF",
+        surface: isDark ? "#334155" : "#F1F5F9",
         
         // Text
-        text: isDark ? "#eee" : "#333",
-        textSecondary: isDark ? "#aaa" : "#666",
-        textMuted: isDark ? "#888" : "#999",
+        text: isDark ? "#F1F5F9" : "#1E293B",
+        textSecondary: isDark ? "#94A3B8" : "#64748B",
+        textMuted: isDark ? "#64748B" : "#94A3B8",
         
-        // Brand
-        primary: "#2196F3",
-        primaryDark: "#1976D2",
+        // Brand - Modern Indigo/Purple
+        primary: "#6366F1",
+        primaryDark: "#4F46E5",
+        primaryLight: "#818CF8",
+        accent: "#8B5CF6",
         
         // Status
-        success: "#4CAF50",
-        warning: "#FF9800",
-        danger: "#F44336",
-        info: "#2196F3",
+        success: "#10B981",
+        successLight: "#34D399",
+        warning: "#F59E0B",
+        warningLight: "#FBBF24",
+        danger: "#EF4444",
+        dangerLight: "#F87171",
+        info: "#3B82F6",
+        infoLight: "#60A5FA",
         
         // UI Elements
-        border: isDark ? "#333" : "#e0e0e0",
-        divider: isDark ? "#2a2a2a" : "#f0f0f0",
-        overlay: isDark ? "rgba(0,0,0,0.8)" : "rgba(0,0,0,0.7)",
+        border: isDark ? "#334155" : "#E2E8F0",
+        divider: isDark ? "#334155" : "#F1F5F9",
+        overlay: isDark ? "rgba(15, 23, 42, 0.9)" : "rgba(30, 41, 59, 0.8)",
         
         // Camera overlay
-        cameraOverlay: "rgba(0,0,0,0.5)",
-        scanFrame: "#2196F3",
+        cameraOverlay: "rgba(15, 23, 42, 0.6)",
+        scanFrame: "#6366F1",
+        scanFrameGlow: "#8B5CF6",
         
         // Additional
-        shadow: isDark ? "#000" : "#000",
-        disabled: isDark ? "#555" : "#ccc",
+        shadow: isDark ? "#000" : "#64748B",
+        disabled: isDark ? "#475569" : "#CBD5E1",
+        
+        // Gradients (for future use)
+        gradientStart: "#6366F1",
+        gradientEnd: "#8B5CF6",
       },
     }),
     [isDark]

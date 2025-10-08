@@ -12,12 +12,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "../contexts/AppContext";
+import { useLocale } from "../contexts/LocaleContext";
+import { useThemeMode } from "../contexts/ThemeContext";
 import VirusTotalService from "../services/VirusTotalService";
 
 const SetupScreen = ({ navigation }) => {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const { actions } = useApp();
+  const { t } = useLocale();
+  const { theme } = useThemeMode();
 
   const handleGetApiKey = () => {
     Linking.openURL("https://www.virustotal.com/gui/join-us");
@@ -25,7 +29,7 @@ const SetupScreen = ({ navigation }) => {
 
   const validateAndSaveApiKey = async () => {
     if (!apiKey.trim()) {
-      Alert.alert("Error", "Please enter your VirusTotal API key");
+      Alert.alert(t('errors.error'), t('errors.enterValidKey'));
       return;
     }
 
@@ -38,20 +42,20 @@ const SetupScreen = ({ navigation }) => {
       if (isValid) {
         await actions.setApiKey(apiKey.trim());
         Alert.alert(
-          "Success!",
+          t('errors.success'),
           "API key validated successfully. You can now start scanning QR codes.",
-          [{ text: "OK", onPress: () => navigation.replace("Scanner") }]
+          [{ text: t('common.ok'), onPress: () => navigation.replace("Scanner") }]
         );
       } else {
         Alert.alert(
-          "Invalid API Key",
-          "The API key you entered is not valid. Please check and try again."
+          t('errors.invalidApiKey'),
+          t('errors.invalidApiKeyMessage')
         );
       }
     } catch (error) {
       Alert.alert(
-        "Validation Failed",
-        "Failed to validate API key. Please check your internet connection and try again."
+        t('errors.validationFailed'),
+        t('errors.validationFailedMessage')
       );
     } finally {
       setIsValidating(false);
@@ -59,42 +63,73 @@ const SetupScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome to BasiraQr </Text>
-          <Text style={styles.subtitle}>
-            Protect yourself from malicious QR codes
+          <Text style={[styles.title, { color: theme.colors.primary }]}>
+            {t('setup.welcome')}
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+            {t('setup.protect')}
           </Text>
         </View>
 
         <View style={styles.content}>
-          <View style={styles.infoSection}>
-            <Text style={styles.infoTitle}>🛡️ How it works:</Text>
-            <Text style={styles.infoText}>
-              • Scan QR codes safely{"\n"}• Check URLs with VirusTotal{"\n"}•
-              Get security warnings{"\n"}• Browse with confidence
+          <View style={[
+            styles.infoSection,
+            {
+              backgroundColor: theme.dark ? theme.colors.surface : '#e3f2fd',
+            }
+          ]}>
+            <Text style={[
+              styles.infoTitle,
+              { color: theme.dark ? theme.colors.primary : '#1976D2' }
+            ]}>
+              🛡️ How it works:
+            </Text>
+            <Text style={[styles.infoText, { color: theme.colors.text }]}>
+              • Scan QR codes safely{"\n"}
+              • Check URLs with VirusTotal{"\n"}
+              • Get security warnings{"\n"}
+              • Browse with confidence
             </Text>
           </View>
 
-          <View style={styles.setupSection}>
-            <Text style={styles.setupTitle}>Setup Required</Text>
-            <Text style={styles.setupText}>
+          <View style={[
+            styles.setupSection,
+            { backgroundColor: theme.colors.card }
+          ]}>
+            <Text style={[styles.setupTitle, { color: theme.colors.text }]}>
+              Setup Required
+            </Text>
+            <Text style={[styles.setupText, { color: theme.colors.textSecondary }]}>
               To get started, you need a free VirusTotal API key:
             </Text>
 
             <TouchableOpacity
-              style={styles.linkButton}
+              style={[styles.linkButton, { backgroundColor: theme.colors.success }]}
               onPress={handleGetApiKey}
             >
-              <Text style={styles.linkButtonText}>📝 Get Free API Key</Text>
+              <Text style={styles.linkButtonText}>
+                {t('setup.getKey')}
+              </Text>
             </TouchableOpacity>
 
             <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>Enter your API Key:</Text>
+              <Text style={[styles.inputLabel, { color: theme.colors.text }]}>
+                {t('setup.enterKey')}
+              </Text>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    borderColor: theme.colors.border,
+                    color: theme.colors.text,
+                    backgroundColor: theme.colors.surface,
+                  }
+                ]}
                 placeholder="Paste your VirusTotal API key here"
+                placeholderTextColor={theme.colors.textMuted}
                 value={apiKey}
                 onChangeText={setApiKey}
                 multiline
@@ -106,8 +141,8 @@ const SetupScreen = ({ navigation }) => {
             <TouchableOpacity
               style={[
                 styles.continueButton,
-                (!apiKey.trim() || isValidating) &&
-                  styles.continueButtonDisabled,
+                { backgroundColor: theme.colors.primary },
+                (!apiKey.trim() || isValidating) && { backgroundColor: theme.colors.disabled },
               ]}
               onPress={validateAndSaveApiKey}
               disabled={!apiKey.trim() || isValidating}
@@ -116,17 +151,30 @@ const SetupScreen = ({ navigation }) => {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.continueButtonText}>
-                  Validate & Continue
+                  {t('setup.validateContinue')}
                 </Text>
               )}
             </TouchableOpacity>
           </View>
 
-          <View style={styles.privacySection}>
-            <Text style={styles.privacyTitle}>🔒 Privacy Notice</Text>
-            <Text style={styles.privacyText}>
-              Your API key is stored securely on your device only. URLs are sent
-              to VirusTotal for analysis as per their privacy policy.
+          <View style={[
+            styles.privacySection,
+            {
+              backgroundColor: theme.dark ? theme.colors.surface : '#fff3cd',
+              borderLeftColor: theme.colors.warning,
+            }
+          ]}>
+            <Text style={[
+              styles.privacyTitle,
+              { color: theme.dark ? theme.colors.warning : '#856404' }
+            ]}>
+              🔒 {t('setup.privacyTitle')}
+            </Text>
+            <Text style={[
+              styles.privacyText,
+              { color: theme.dark ? theme.colors.textSecondary : '#856404' }
+            ]}>
+              {t('setup.privacy')}
             </Text>
           </View>
         </View>
@@ -138,7 +186,6 @@ const SetupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   scrollContent: {
     flexGrow: 1,
@@ -151,19 +198,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#2196F3",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
     textAlign: "center",
   },
   content: {
     flex: 1,
   },
   infoSection: {
-    backgroundColor: "#e3f2fd",
     padding: 20,
     borderRadius: 10,
     marginBottom: 30,
@@ -171,16 +215,13 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#1976D2",
     marginBottom: 10,
   },
   infoText: {
     fontSize: 16,
-    color: "#333",
     lineHeight: 24,
   },
   setupSection: {
-    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     marginBottom: 20,
@@ -196,16 +237,13 @@ const styles = StyleSheet.create({
   setupTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
   },
   setupText: {
     fontSize: 16,
-    color: "#666",
     marginBottom: 15,
   },
   linkButton: {
-    backgroundColor: "#4CAF50",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -222,12 +260,10 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
     padding: 15,
     fontSize: 16,
@@ -236,13 +272,9 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   continueButton: {
-    backgroundColor: "#2196F3",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-  },
-  continueButtonDisabled: {
-    backgroundColor: "#ccc",
   },
   continueButtonText: {
     color: "#fff",
@@ -250,21 +282,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   privacySection: {
-    backgroundColor: "#fff3cd",
     padding: 15,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#ffc107",
   },
   privacyTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#856404",
     marginBottom: 5,
   },
   privacyText: {
     fontSize: 14,
-    color: "#856404",
     lineHeight: 20,
   },
 });
