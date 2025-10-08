@@ -38,7 +38,7 @@ class VirusTotalServiceV3 {
     }
   }
 
-  async scanUrl(url) {
+  async scanUrl(url, retryCount = 0, maxRetries = 3) {
     if (!this.apiKey) throw new Error("API key not set");
 
     // 1. Submit URL for scanning
@@ -55,8 +55,10 @@ class VirusTotalServiceV3 {
 
     const analysisId = submitResponse.data.data.id; // looks like "u-xxxx..."
 
-    // 2. Poll the analysis endpoint
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // 2. Poll the analysis endpoint with progressive delays
+    const delays = [3000, 5000, 8000, 10000];
+    const delay = delays[retryCount] || 10000;
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
     const reportResponse = await axios.get(
       `${this.baseUrl}/analyses/${analysisId}`,
@@ -67,10 +69,15 @@ class VirusTotalServiceV3 {
       }
     );
 
-    // Some analyses may still be "in-progress"
+    // Some analyses may still be "in-progress" or "queued"
     const attributes = reportResponse.data.data.attributes;
-    if (attributes.status === "queued") {
-      throw new Error("Analysis still queued, try again later.");
+    if (attributes.status === "queued" || attributes.status === "in-progress") {
+      if (retryCount < maxRetries) {
+        // Retry with exponential backoff
+        return this.scanUrl(url, retryCount + 1, maxRetries);
+      } else {
+        throw new Error("QUEUED");
+      }
     }
 
     return this.parseVirusTotalReportV3(reportResponse.data);

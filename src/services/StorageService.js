@@ -24,6 +24,24 @@ class StorageService {
     const settings = await AsyncStorage.getItem("app_settings");
     return settings ? JSON.parse(settings) : {};
   }
+
+  // Locale storage
+  static async storeLocale(locale) {
+    await AsyncStorage.setItem("app_locale", locale);
+  }
+
+  static async getLocale() {
+    return await AsyncStorage.getItem("app_locale");
+  }
+
+  // Theme storage
+  static async storeThemeMode(mode) {
+    await AsyncStorage.setItem("app_theme_mode", mode);
+  }
+
+  static async getThemeMode() {
+    return await AsyncStorage.getItem("app_theme_mode");
+  }
 }
 
 export default StorageService;

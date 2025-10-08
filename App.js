@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { Alert, TouchableOpacity, Text } from "react-native";
+import { Alert } from "react-native";
 
 // Screens
 import SetupScreen from "./src/screens/SetupScreen";
@@ -13,7 +13,11 @@ import SettingsScreen from "./src/screens/SettingsScreen";
 
 // Services
 import StorageService from "./src/services/StorageService";
+
+// Contexts
 import { AppProvider } from "./src/contexts/AppContext";
+import { ThemeProvider } from "./src/contexts/ThemeContext";
+import { LocaleProvider } from "./src/contexts/LocaleContext";
 
 const Stack = createStackNavigator();
 
@@ -43,59 +47,53 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <AppProvider>
-        <NavigationContainer>
-          <StatusBar style="auto" />
-          <Stack.Navigator
-            initialRouteName={isSetupComplete ? "Scanner" : "Setup"}
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: "#2196F3",
-              },
-              headerTintColor: "#fff",
-              headerTitleStyle: {
-                fontWeight: "bold",
-              },
-            }}
-          >
-            <Stack.Screen
-              name="Setup"
-              component={SetupScreen}
-              options={{
-                title: "BasiraQr Setup",
-                headerLeft: null,
-              }}
-            />
-            <Stack.Screen
-              name="Scanner"
-              component={ScannerScreen}
-              options={({ navigation }) => ({
-                title: "BasiraQr ",
-                headerRight: () => (
-                  <TouchableOpacity
-                    style={{ marginRight: 15 }}
-                    onPress={() => navigation.navigate("Settings")}
-                  >
-                    <Text style={{ color: "#fff", fontSize: 16 }}>
-                      Settings
-                    </Text>
-                  </TouchableOpacity>
-                ),
-              })}
-            />
-            <Stack.Screen
-              name="Results"
-              component={ResultsScreen}
-              options={{ title: "Scan Results" }}
-            />
-            <Stack.Screen
-              name="Settings"
-              component={SettingsScreen}
-              options={{ title: "Settings" }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </AppProvider>
+      <ThemeProvider>
+        <LocaleProvider>
+          <AppProvider>
+            <NavigationContainer>
+              <StatusBar style="auto" />
+              <Stack.Navigator
+                initialRouteName={isSetupComplete ? "Scanner" : "Setup"}
+                screenOptions={{
+                  headerStyle: {
+                    backgroundColor: "#2196F3",
+                  },
+                  headerTintColor: "#fff",
+                  headerTitleStyle: {
+                    fontWeight: "bold",
+                  },
+                }}
+              >
+                <Stack.Screen
+                  name="Setup"
+                  component={SetupScreen}
+                  options={{
+                    title: "BasiraQr Setup",
+                    headerLeft: null,
+                  }}
+                />
+                <Stack.Screen
+                  name="Scanner"
+                  component={ScannerScreen}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="Results"
+                  component={ResultsScreen}
+                  options={{ title: "Scan Results" }}
+                />
+                <Stack.Screen
+                  name="Settings"
+                  component={SettingsScreen}
+                  options={{ title: "Settings" }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </AppProvider>
+        </LocaleProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
