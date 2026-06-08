@@ -75,7 +75,7 @@ const virusTotalTests = {
       },
     };
     const report = VirusTotalService.parseReport(data);
-    T.assertEqual('positives = 5', report.positives, 5);
+    T.assertEqual('positives = 6 (5 malicious + 1 suspicious)', report.positives, 6);
     T.assertEqual('total = 76', report.total, 76);
     T.assertEqual('responseCode = 1', report.responseCode, 1);
     T.assert('has permalink', report.permalink.includes('virustotal.com'));
@@ -98,31 +98,86 @@ const virusTotalTests = {
     T.assertEqual('total = 75', report.total, 75);
   },
 
-  // ── determineSecurityLevel ─────────────────
-  'VirusTotalService — determineSecurityLevel': () => {
-    T.assertEqual('0 total → UNKNOWN',    VirusTotalService.determineSecurityLevel({ positives: 0, total: 0, responseCode: 1 }), 'UNKNOWN');
-    T.assertEqual('responseCode=0 → UNKNOWN', VirusTotalService.determineSecurityLevel({ positives: 0, total: 70, responseCode: 0 }), 'UNKNOWN');
-    T.assertEqual('0/70 → SAFE',          VirusTotalService.determineSecurityLevel({ positives: 0, total: 70, responseCode: 1 }), 'SAFE');
-    T.assertEqual('1/70 (<10%) → SUSPICIOUS', VirusTotalService.determineSecurityLevel({ positives: 1, total: 70, responseCode: 1 }), 'SUSPICIOUS');
-    T.assertEqual('7/70 (10%) → MALICIOUS',   VirusTotalService.determineSecurityLevel({ positives: 7, total: 70, responseCode: 1 }), 'MALICIOUS');
-    T.assertEqual('70/70 → MALICIOUS',     VirusTotalService.determineSecurityLevel({ positives: 70, total: 70, responseCode: 1 }), 'MALICIOUS');
+  'VirusTotalService — parseReport: suspicious-only (was incorrectly SAFE before fix)': () => {
+    const data = {
+      data: {
+        id: 'sus123',
+        attributes: {
+          stats: { malicious: 0, undetected: 68, harmless: 5, suspicious: 2 },
+          results: {},
+          status: 'completed',
+        },
+      },
+    };
+    const report = VirusTotalService.parseReport(data);
+    T.assertEqual('positives = 2 (suspicious counted)', report.positives, 2);
+    T.assertEqual('total = 75', report.total, 75);
+    // Zero-tolerance: even 1 flag → MALICIOUS (not SAFE, not SUSPICIOUS)
+    const level = VirusTotalService.determineSecurityLevel(report);
+    T.assertEqual('1 suspicious flag → MALICIOUS (zero tolerance)', level, 'MALICIOUS');
   },
 
-  // ── formatScans ────────────────────────────
-  'VirusTotalService — formatScans': () => {
-    const scans = {
-      EngineA: { category: 'malicious',  result: 'Trojan.Foo' },
-      EngineB: { category: 'undetected', result: null },
-      EngineC: { category: 'suspicious', result: 'Heuristic.Bar' },
-      EngineD: { category: 'harmless',   result: null },
+  // ── parseReport: edge cases ────────────────
+  'VirusTotalService — parseReport: missing stats object': () => {
+    const data = {
+      data: {
+        id: 'edge1',
+        attributes: { results: {}, status: 'completed' }, // no stats key at all
+      },
     };
-    const fmt = VirusTotalService.formatScans(scans);
-    T.assertEqual('malicious → detected:true',   fmt.EngineA.detected, true);
-    T.assertEqual('undetected → detected:false',  fmt.EngineB.detected, false);
-    T.assertEqual('suspicious → detected:true',   fmt.EngineC.detected, true);
-    T.assertEqual('harmless → detected:false',    fmt.EngineD.detected, false);
-    T.assertEqual('malicious result preserved',   fmt.EngineA.result, 'Trojan.Foo');
-    T.assertEqual('null result fallback to cat',  fmt.EngineB.result, 'undetected');
+    const report = VirusTotalService.parseReport(data);
+    T.assertEqual('missing stats → positives=0', report.positives, 0);
+    T.assertEqual('missing stats → total=0',     report.total, 0);
+    T.assertEqual('responseCode still 1',        report.responseCode, 1);
+  },
+
+  'VirusTotalService — parseReport: missing date field': () => {
+    const data = {
+      data: {
+        id: 'edge2',
+        attributes: {
+          stats: { malicious: 1, undetected: 50, harmless: 0, suspicious: 0 },
+          results: {},
+          // no 'date' field
+        },
+      },
+    };
+    const report = VirusTotalService.parseReport(data);
+    T.assert('missing date → fallback to now (is string)', typeof report.scanDate === 'string');
+    T.assert('missing date → fallback contains T', report.scanDate.includes('T'));
+  },
+
+  'VirusTotalService — determineSecurityLevel: boundaries': () => {
+    // Zero-tolerance: any positive ≥ 1 → MALICIOUS
+    T.assertEqual('0 total → UNKNOWN',        VirusTotalService.determineSecurityLevel({ positives: 0, total: 0, responseCode: 1 }), 'UNKNOWN');
+    T.assertEqual('responseCode=0 → UNKNOWN', VirusTotalService.determineSecurityLevel({ positives: 0, total: 70, responseCode: 0 }), 'UNKNOWN');
+    T.assertEqual('0/70 → SAFE',              VirusTotalService.determineSecurityLevel({ positives: 0, total: 70, responseCode: 1 }), 'SAFE');
+    T.assertEqual('1/70 → MALICIOUS (zero tolerance)',  VirusTotalService.determineSecurityLevel({ positives: 1,  total: 70, responseCode: 1 }), 'MALICIOUS');
+    T.assertEqual('2/70 → MALICIOUS',         VirusTotalService.determineSecurityLevel({ positives: 2,  total: 70, responseCode: 1 }), 'MALICIOUS');
+    T.assertEqual('7/70 → MALICIOUS',         VirusTotalService.determineSecurityLevel({ positives: 7,  total: 70, responseCode: 1 }), 'MALICIOUS');
+    T.assertEqual('70/70 → MALICIOUS',        VirusTotalService.determineSecurityLevel({ positives: 70, total: 70, responseCode: 1 }), 'MALICIOUS');
+    T.assertEqual('1/1 → MALICIOUS',          VirusTotalService.determineSecurityLevel({ positives: 1,  total: 1,  responseCode: 1 }), 'MALICIOUS');
+    T.assertEqual('0/1 → SAFE',               VirusTotalService.determineSecurityLevel({ positives: 0,  total: 1,  responseCode: 1 }), 'SAFE');
+    T.assertEqual('positives=1 total=0 → UNKNOWN (div/0 guard)', VirusTotalService.determineSecurityLevel({ positives: 1, total: 0, responseCode: 1 }), 'UNKNOWN');
+  },
+
+  // ── formatScans: edge cases ─────────────────
+  'VirusTotalService — formatScans: edge cases': () => {
+    // Empty scans object
+    const empty = VirusTotalService.formatScans({});
+    T.assertEqual('empty scans → {}', JSON.stringify(empty), '{}');
+
+    // Engine with null category
+    const nullCat = VirusTotalService.formatScans({
+      EngineX: { category: null, result: null },
+    });
+    T.assertEqual('null category → detected:false', nullCat.EngineX.detected, false);
+
+    // Engine with 'type-unsupported' category (VT special)
+    const unsupported = VirusTotalService.formatScans({
+      EngineY: { category: 'type-unsupported', result: null },
+    });
+    T.assertEqual('type-unsupported → detected:false', unsupported.EngineY.detected, false);
   },
 };
 

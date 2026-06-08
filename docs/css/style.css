@@ -55,7 +55,7 @@ body {
 #app { display: flex; flex-direction: column; height: 100dvh; width: 100%; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; }
 
 /* ── Screens ── */
-.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
+.screen { display: none; flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .screen.active { display: flex; flex-direction: column; }
 
 /* ── Bottom Nav ── */
@@ -86,7 +86,7 @@ body {
 /* ── Setup Screen ── */
 #screen-setup {
   justify-content: center; align-items: center; padding: 24px 20px;
-  min-height: 100%; background: linear-gradient(160deg, var(--bg) 0%, var(--bg-surf) 100%);
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg-surf) 100%);
 }
 .setup-logo { font-size: 72px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }

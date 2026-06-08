@@ -83,7 +83,7 @@ const VirusTotalService = {
     const attrs = data.data.attributes;
     const stats = attrs.stats || {};
     const scans = attrs.results || {};
-    const positives = stats.malicious || 0;
+    const positives = (stats.malicious || 0) + (stats.suspicious || 0); // both count as flagged
     const total = (stats.malicious || 0) + (stats.undetected || 0) + (stats.harmless || 0) + (stats.suspicious || 0);
 
     return {
@@ -110,10 +110,8 @@ const VirusTotalService = {
   determineSecurityLevel(report) {
     if (report.responseCode === 0) return 'UNKNOWN';
     if (report.total === 0) return 'UNKNOWN';
-    const ratio = report.positives / report.total;
-    if (ratio === 0) return 'SAFE';
-    if (ratio < 0.1) return 'SUSPICIOUS';
-    return 'MALICIOUS';
+    if (report.positives === 0) return 'SAFE';
+    return 'MALICIOUS'; // zero tolerance: even 1 vendor flag = dangerous
   },
 };
 

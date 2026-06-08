@@ -22,7 +22,8 @@ const Storage = {
   storeSettings(settings) { this._set('app_settings', JSON.stringify(settings)); },
   getSettings() {
     const raw = this._get('app_settings');
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) return {};
+    try { return JSON.parse(raw); } catch { return {}; }
   },
 
   // Locale
@@ -40,7 +41,8 @@ const Storage = {
   // Scan History (up to 20 items)
   getScanHistory() {
     const raw = this._get('scan_history');
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    try { return JSON.parse(raw); } catch { return []; } // corrupted data → reset gracefully
   },
   addScanResult(result) {
     const history = this.getScanHistory();
