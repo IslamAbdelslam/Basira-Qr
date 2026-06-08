@@ -1,7 +1,8 @@
-const CACHE_NAME = 'basira-qr-v4';
+const CACHE_NAME = 'basira-qr-v5';
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './app.html',
   './css/style.css',
   './js/i18n.js',
   './js/storage.js',

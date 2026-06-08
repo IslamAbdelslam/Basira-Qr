@@ -1,352 +1,474 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark" data-scheme="indigo">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Basira QR · بصيرة كيو آر</title>
-  <meta name="description" content="Secure QR code scanner powered by VirusTotal – ماسح QR آمن"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>بصيرة كيو آر – ماسح QR آمن</title>
+  <meta name="description" content="امسح رموز QR بأمان وثقة. بصيرة كيو آر يحللها بـ VirusTotal قبل أن تفتحها."/>
   <meta name="theme-color" content="#6366F1"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="BasiraQR"/>
   <link rel="manifest" href="manifest.json"/>
-  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
-  <link rel="icon" type="image/png" href="icons/icon-192.png"/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="icons/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #6366F1;
+      --primary-light: #818CF8;
+      --primary-dark: #4F46E5;
+      --accent: #06B6D4;
+      --success: #10B981;
+      --danger: #EF4444;
+      --bg: #0A0A0F;
+      --bg2: #111118;
+      --bg3: #1A1A26;
+      --card: #16161F;
+      --border: rgba(255,255,255,0.08);
+      --text: #F1F5F9;
+      --text2: #94A3B8;
+      --text3: #64748B;
+      --glow: rgba(99,102,241,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Tajawal', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 90% 80%, rgba(6,182,212,0.1) 0%, transparent 60%);
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon { font-size: 24px; }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--text); }
+    .nav-cta {
+      background: var(--primary); color: #fff; border: none; cursor: pointer;
+      padding: 10px 20px; border-radius: 24px; font-size: 14px; font-weight: 600;
+      font-family: inherit; text-decoration: none; transition: all 0.2s;
+    }
+    .nav-cta:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 20px var(--glow); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 80px 24px 60px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+      color: var(--primary-light); border-radius: 24px;
+      padding: 6px 16px; font-size: 13px; font-weight: 600; margin-bottom: 32px;
+      animation: fadeInDown 0.6s ease;
+    }
+    .hero-icon {
+      font-size: 80px; margin-bottom: 24px;
+      filter: drop-shadow(0 0 30px rgba(99,102,241,0.5));
+      animation: float 3s ease-in-out infinite, fadeInDown 0.6s ease 0.1s both;
+    }
+    .hero-title {
+      font-size: clamp(32px, 7vw, 56px); font-weight: 900; line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, var(--primary-light) 50%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 3vw, 20px); color: var(--text2); max-width: 560px;
+      line-height: 1.7; margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease 0.3s both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      animation: fadeInUp 0.6s ease 0.4s both;
+    }
+    .btn-hero-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff; border: none; cursor: pointer;
+      padding: 16px 36px; border-radius: 32px; font-size: 18px; font-weight: 700;
+      font-family: inherit; text-decoration: none; transition: all 0.25s;
+      box-shadow: 0 4px 30px var(--glow);
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(99,102,241,0.4);
+    }
+    .btn-hero-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--text2);
+      border: 1px solid var(--border); cursor: pointer;
+      padding: 16px 28px; border-radius: 32px; font-size: 16px; font-weight: 600;
+      font-family: inherit; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-hero-secondary:hover { border-color: var(--primary-light); color: var(--text); }
+
+    /* ── Stats ── */
+    .stats {
+      display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+      padding: 32px 24px; position: relative; z-index: 1;
+      margin-bottom: 20px;
+    }
+    .stat { text-align: center; }
+    .stat-value { font-size: 32px; font-weight: 900; color: var(--primary-light); }
+    .stat-label { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+    /* ── How it works ── */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto; padding: 60px 24px;
+    }
+    .section-label {
+      text-align: center; font-size: 13px; font-weight: 700;
+      color: var(--primary-light); text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(24px, 4vw, 36px); font-weight: 800;
+      margin-bottom: 48px; line-height: 1.3;
+    }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+    .step-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 28px 24px; text-align: center; position: relative;
+      transition: all 0.3s; overflow: hidden;
+    }
+    .step-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.3); }
+    .step-card:hover::before { opacity: 1; }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; font-size: 16px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step-icon { font-size: 36px; margin-bottom: 12px; }
+    .step-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 28px 24px; display: flex; gap: 20px; align-items: flex-start;
+      transition: all 0.3s;
+    }
+    .feature-card:hover { transform: translateY(-2px); border-color: rgba(99,102,241,0.3); }
+    .feature-icon {
+      font-size: 32px; flex-shrink: 0;
+      width: 56px; height: 56px; border-radius: 16px;
+      background: rgba(99,102,241,0.12);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feature-body {}
+    .feature-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .feature-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+    /* ── Phone Mockup ── */
+    .mockup-section {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 24px 60px;
+    }
+    .phone-mockup {
+      width: 260px; height: 520px; border-radius: 36px;
+      background: var(--bg3); border: 3px solid rgba(255,255,255,0.12);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden; position: relative;
+      animation: float 4s ease-in-out infinite;
+    }
+    .phone-screen {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      background: linear-gradient(160deg, #0f0f1a 0%, #1a1a2e 100%);
+    }
+    .phone-cam {
+      flex: 1; background: #000; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .phone-cam::after {
+      content: ''; position: absolute;
+      width: 120px; height: 120px;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);
+      animation: scanPulse 2s ease-in-out infinite;
+    }
+    .phone-cam-line {
+      position: absolute; width: 100px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      animation: scanLine 2s linear infinite;
+      z-index: 1;
+    }
+    .phone-result {
+      background: var(--card); padding: 16px; border-top: 1px solid var(--border);
+    }
+    .phone-result-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,0.15); color: #10B981;
+      border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700;
+    }
+    .phone-result-url { font-size: 11px; color: var(--text3); margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .phone-score { font-size: 11px; color: var(--text2); margin-top: 4px; }
+    .phone-nav {
+      display: flex; background: var(--bg2); padding: 8px 0 12px;
+      border-top: 1px solid var(--border);
+    }
+    .phone-nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      font-size: 18px;
+    }
+    .phone-nav-btn span { font-size: 9px; color: var(--text3); }
+    .phone-nav-btn.active span { color: var(--primary-light); }
+
+    /* ── CTA Section ── */
+    .cta-section {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px 24px 80px;
+    }
+    .cta-card {
+      max-width: 600px; margin: 0 auto;
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.08));
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 32px; padding: 52px 40px;
+    }
+    .cta-title { font-size: clamp(24px, 4vw, 36px); font-weight: 900; margin-bottom: 16px; }
+    .cta-sub { font-size: 16px; color: var(--text2); margin-bottom: 36px; line-height: 1.6; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text3); font-size: 13px;
+    }
+    footer a { color: var(--primary-light); text-decoration: none; }
+
+    /* ── Animations ── */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes scanLine {
+      0% { top: 40px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: calc(100% - 40px); opacity: 0; }
+    }
+    @keyframes scanPulse {
+      0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.4), 0 0 0 2px var(--primary); }
+      50% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.4), 0 0 12px 4px rgba(99,102,241,0.6); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 520px) {
+      .stats { gap: 28px; }
+      .hero { padding: 60px 20px 40px; }
+      .cta-card { padding: 36px 24px; }
+      .btn-hero-primary { padding: 14px 28px; font-size: 16px; }
+    }
+  </style>
 </head>
 <body>
-<div id="app">
+<div class="bg-glow"></div>
 
-  <!-- ══════════════════════════════════════
-       SETUP SCREEN
-  ══════════════════════════════════════ -->
-  <div id="screen-setup" class="screen">
+<!-- Nav -->
+<nav>
+  <a class="nav-logo" href="./index.html">
+    <span class="nav-logo-icon">🛡️</span>
+    <span class="nav-logo-text">بصيرة كيو آر</span>
+  </a>
+  <a class="nav-cta" href="./app.html">جرّب التطبيق مجاناً ←</a>
+</nav>
 
-    <!-- State A: No key yet (welcome) -->
-    <div id="setup-tab-welcome" style="display:flex;flex-direction:column;align-items:center;padding:32px 20px;flex:1">
-      <div class="setup-logo">🛡️</div>
-      <h1 class="setup-title" data-i18n="setup.welcome">مرحباً بك في بصيرة كيو آر</h1>
-      <p class="setup-sub" data-i18n="setup.protect">احمِ نفسك من رموز الاستجابة السريعة الخبيثة</p>
-      <div class="card setup-card">
-        <form id="setup-form">
-          <label class="form-label" for="api-key-input" data-i18n="setup.enterKey">أدخل مفتاح API:</label>
-          <div class="input-wrap">
-            <input id="api-key-input" class="form-input" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••••••••••••••"/>
-            <button type="button" id="toggle-key-visibility" class="icon-btn" aria-label="Toggle visibility">👁️</button>
-          </div>
-          <button type="submit" id="validate-btn" class="btn-primary" data-i18n="setup.validateContinue">تحقق ثم تابع</button>
-        </form>
-        <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" class="setup-link" data-i18n="setup.getKey">الحصول على مفتاح API مجاناً</a>
-        <div class="privacy-box">
-          <div class="privacy-title" data-i18n="setup.privacyTitle">إشعار الخصوصية</div>
-          <div class="privacy-text" data-i18n="setup.privacy">يُخزَّن مفتاح API الخاص بك بشكل آمن على جهازك فقط.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- State B: Key already set (manage) -->
-    <div id="setup-tab-change" class="hidden" style="padding:24px 16px">
-      <div class="screen-header" data-i18n="settings.apiKey">مفتاح API</div>
-      <div class="card">
-        <div class="setting-label" data-i18n="settings.currentKey" style="margin-bottom:6px">المفتاح الحالي:</div>
-        <div id="setup-tab-current-key" class="setting-value" style="font-family:monospace;font-size:15px;margin-bottom:16px"></div>
-        <div class="action-buttons">
-          <button class="btn-primary" onclick="App.openChangeApiKey()" data-i18n="settings.changeApiKey">تغيير مفتاح API</button>
-          <button class="btn-outline" style="color:var(--color-danger);border-color:var(--color-danger)" onclick="App.removeApiKey()" data-i18n="settings.removeKey">إزالة مفتاح API</button>
-        </div>
-      </div>
-      <div class="privacy-box" style="margin-top:0">
-        <div class="privacy-title" data-i18n="setup.privacyTitle">إشعار الخصوصية</div>
-        <div class="privacy-text" data-i18n="setup.privacy">يُخزَّن مفتاح API الخاص بك بشكل آمن على جهازك فقط.</div>
-      </div>
-    </div>
-
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">✨ مدعوم بـ VirusTotal</div>
+  <div class="hero-icon">🛡️</div>
+  <h1 class="hero-title">امسح رموز QR<br/>بأمان وثقة تامة</h1>
+  <p class="hero-sub">
+    بصيرة كيو آر يحلل كل رمز QR تمسحه عبر 90+ جهة أمان عالمية قبل أن تفتح أي رابط.
+    احمِ نفسك من المواقع الخبيثة والتصيد الاحتيالي.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-hero-primary" href="./app.html">
+      📷 جرّب التطبيق الآن
+    </a>
+    <a class="btn-hero-secondary" href="#features">
+      اعرف أكثر ↓
+    </a>
   </div>
+</section>
 
-  <!-- ══════════════════════════════════════
-       SCANNER SCREEN
-  ══════════════════════════════════════ -->
-  <div id="screen-scanner" class="screen">
-    <video id="scanner-video" playsinline muted autoplay></video>
+<!-- Stats -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-value">92+</div>
+    <div class="stat-label">جهة أمان عالمية</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">مجاني</div>
+    <div class="stat-label">100% مجاني تماماً</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">ثوانٍ</div>
+    <div class="stat-label">وقت التحليل</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">خاص</div>
+    <div class="stat-label">مفتاحك على جهازك فقط</div>
+  </div>
+</div>
 
-    <!-- Camera Error State -->
-    <div id="camera-error" class="camera-error hidden">
-      <div class="camera-error-icon">📷</div>
-      <h3 data-i18n="scanner.cameraRequired">مطلوب إذن الكاميرا</h3>
-      <p id="camera-error-msg" data-i18n="scanner.cameraMsg">يحتاج بصيرة كيو آر للوصول إلى الكاميرا.</p>
-      <button id="grant-camera-btn" class="btn-primary" style="width:auto;padding:12px 28px" data-i18n="scanner.grantPermission">منح الإذن</button>
-    </div>
-
-    <!-- Overlay UI -->
-    <div id="scanner-viewfinder" class="scanner-overlay">
-      <div id="network-banner" class="network-banner hidden"></div>
-
-      <div class="scanner-top">
-        <div class="scan-frame">
-          <div class="corner tl"></div>
-          <div class="corner tr"></div>
-          <div class="corner bl"></div>
-          <div class="corner br"></div>
-          <div class="scan-line"></div>
+<!-- Phone mockup + How it works -->
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:48px;padding:20px 24px 60px;position:relative;z-index:1;max-width:1000px;margin:0 auto">
+  <div class="mockup-section" style="padding:0">
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="phone-cam">
+          <div class="phone-cam-line"></div>
         </div>
-        <button class="scanner-settings-btn" onclick="App.showScreen('settings')" aria-label="Settings">⚙️</button>
+        <div class="phone-result">
+          <div class="phone-result-badge">✅ آمن للزيارة</div>
+          <div class="phone-result-url">https://www.example.com</div>
+          <div class="phone-score">0 / 92 جهة أمان أشارت إليه</div>
+        </div>
+        <div class="phone-nav">
+          <div class="phone-nav-btn active">📷<span>الماسح</span></div>
+          <div class="phone-nav-btn">📋<span>السجل</span></div>
+          <div class="phone-nav-btn">🔑<span>المفتاح</span></div>
+          <div class="phone-nav-btn">⚙️<span>الإعدادات</span></div>
+        </div>
       </div>
-
-      <div class="scanner-bottom">
-        <div id="scanner-status" class="scanner-status" data-i18n="scanner.active">🛡️ بصيرة كيو آر نشط</div>
-        <div class="scanner-hint" data-i18n="scanner.pointCamera">وجّه الكاميرا نحو رمز QR لمسحه بأمان</div>
-      </div>
-
-      <div class="history-chip">
-        📊 <span id="history-badge">0</span>
-      </div>
-    </div>
-
-    <!-- Processing Overlay -->
-    <div id="processing-overlay" class="processing-overlay hidden">
-      <div class="spinner"></div>
-      <div id="processing-stage" class="processing-text" data-i18n="scanner.analyzingUrl">جارٍ تحليل الرابط...</div>
-      <div class="processing-sub" data-i18n="scanner.pleaseWait">يرجى الانتظار</div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════
-       RESULTS SCREEN
-  ══════════════════════════════════════ -->
-  <div id="screen-results" class="screen">
-    <div class="card" style="text-align:center">
-      <span id="security-badge" class="security-badge">✅ آمن للزيارة</span>
-      <div id="result-title" class="result-title" data-i18n="results.safeToVisit">آمن للزيارة</div>
-      <div id="result-status-msg" class="result-msg"></div>
-      <div id="result-action-text" class="result-action" style="margin-top:8px"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title" data-i18n="results.urlInfo">📍 معلومات الرابط</div>
-      <p id="result-url" class="url-text" style="margin-bottom:12px"></p>
-      <div class="info-row">
-        <span class="info-label" data-i18n="results.domain">النطاق:</span>
-        <span id="result-domain" class="info-value"></span>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="results.protocol">البروتوكول:</span>
-        <span id="result-protocol" class="info-value"></span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title" data-i18n="results.securityAnalysis">🛡️ تحليل الأمان</div>
-      <div class="score-display">
-        <div id="result-score" class="score-number">0/0</div>
-        <div class="score-label" data-i18n="results.vendorsFlagged">جهات الأمان أشارت إلى هذا الرابط</div>
-      </div>
-      <div id="result-http-warning" class="warning-bar hidden" data-i18n="results.httpWarning">⚠️ يستخدم هذا الرابط HTTP</div>
-    </div>
-
-    <div class="card">
-      <div class="details-toggle" id="result-details-toggle">
-        <div class="card-title" style="margin-bottom:0" data-i18n="results.detailedReport">📊 تقرير مفصل</div>
-        <span id="details-toggle-icon" style="font-size:16px;color:var(--text-3)">▶</span>
-      </div>
-      <div id="vendor-details" class="hidden" style="margin-top:14px">
-        <button id="result-permalink-btn" class="btn-permalink hidden" data-i18n="results.viewFullReport">عرض التقرير الكامل على VirusTotal</button>
-        <div style="margin-top:12px">
-          <div class="card-title" style="font-size:13px" data-i18n="results.vendorResults">نتائج جهات الأمان:</div>
-          <div id="vendor-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="action-buttons">
-      <button id="result-open-btn" class="btn-action" style="background:var(--color-success)" data-i18n="results.openSafely">🌐 افتح بأمان</button>
-      <button id="result-share-btn" class="btn-outline" data-i18n="results.share">📤 مشاركة النتائج</button>
-      <button id="result-scan-another" class="btn-outline" data-i18n="results.scanAnother">🔄 مسح آخر</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       HISTORY SCREEN
-  ══════════════════════════════════════ -->
-  <div id="screen-history" class="screen">
-    <div class="screen-header" data-i18n="settings.scanHistory">📊 سجل المسح</div>
-    <div id="history-list"></div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       SETTINGS SCREEN
-  ══════════════════════════════════════ -->
-  <div id="screen-settings" class="screen">
-    <div class="screen-header" data-i18n="settings.title">الإعدادات</div>
-
-    <!-- Appearance -->
-    <div class="settings-section">
-      <div class="settings-section-title" data-i18n="settings.appearance">🎨 المظهر</div>
-      <div class="card" style="padding:16px;margin-bottom:0">
-        <div style="margin-bottom:14px">
-          <div class="setting-label" data-i18n="settings.darkMode">الوضع الداكن</div>
-          <div class="mode-group" style="margin-top:8px">
-            <button class="mode-btn" data-mode="light" data-i18n="settings.light">☀️ فاتح</button>
-            <button class="mode-btn" data-mode="dark"  data-i18n="settings.dark">🌙 داكن</button>
-            <button class="mode-btn" data-mode="system" data-i18n="settings.system">⚙️ النظام</button>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div style="margin-top:14px">
-          <div class="setting-label" data-i18n="settings.colorScheme">نظام الألوان</div>
-          <div class="scheme-swatches" style="margin-top:10px">
-            <div class="scheme-swatch" data-scheme="indigo" style="background:#6366F1" title="Indigo"></div>
-            <div class="scheme-swatch" data-scheme="teal"   style="background:#14B8A6" title="Teal"></div>
-            <div class="scheme-swatch" data-scheme="orange" style="background:#F97316" title="Orange"></div>
-            <div class="scheme-swatch" data-scheme="purple" style="background:#A855F7" title="Purple"></div>
-            <div class="scheme-swatch" data-scheme="blue"   style="background:#2196F3" title="Blue"></div>
-            <div class="scheme-swatch" data-scheme="green"  style="background:#10B981" title="Green"></div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div style="margin-top:14px">
-          <div class="setting-label" data-i18n="settings.language">اللغة</div>
-          <div class="lang-group" style="margin-top:8px">
-            <button class="lang-btn" data-lang="ar" data-i18n="settings.arabic">العربية</button>
-            <button class="lang-btn" data-lang="en" data-i18n="settings.english">English</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VirusTotal Integration -->
-    <div class="settings-section">
-      <div class="settings-section-title" data-i18n="settings.vtIntegration">🔑 تكامل VirusTotal</div>
-      <div class="setting-row">
+  <div style="max-width:380px">
+    <div class="section-label">كيف يعمل؟</div>
+    <h2 class="section-title" style="text-align:right;margin-bottom:28px">3 خطوات فقط</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div class="step-num" style="flex-shrink:0">1</div>
         <div>
-          <div class="setting-label" data-i18n="settings.apiKey">مفتاح API</div>
-          <div id="api-key-display" class="setting-value text-muted">غير محدد</div>
+          <div class="step-title">أضف مفتاح VirusTotal</div>
+          <div class="step-desc">مجاني تماماً، يُخزَّن على جهازك فقط ولا يُرسَل لأحد.</div>
         </div>
-        <button id="btn-change-key" class="btn-settings edit" data-i18n="settings.editKey">تعديل</button>
       </div>
-      <div class="setting-row">
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div class="step-num" style="flex-shrink:0">2</div>
         <div>
-          <div class="setting-label" data-i18n="settings.removeKey">إزالة مفتاح API</div>
-          <div class="setting-sub" data-i18n="settings.removeKeySubtitle">إعادة تعيين التطبيق</div>
+          <div class="step-title">وجّه الكاميرا نحو رمز QR</div>
+          <div class="step-desc">الكاميرا تعمل مباشرة في المتصفح بدون تطبيق منفصل.</div>
         </div>
-        <button id="btn-remove-key" class="btn-settings danger" data-i18n="settings.removeKey">إزالة</button>
       </div>
-    </div>
-
-    <!-- Scan History -->
-    <div class="settings-section">
-      <div class="settings-section-title" data-i18n="settings.scanHistory">📊 سجل المسح</div>
-      <div class="setting-row">
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div class="step-num" style="flex-shrink:0">3</div>
         <div>
-          <div class="setting-label" data-i18n="settings.totalScans">إجمالي المسح</div>
-          <div id="scan-count" class="setting-sub"></div>
+          <div class="step-title">شاهد تقرير الأمان فوراً</div>
+          <div class="step-desc">تحليل فوري من 92+ جهة أمان عالمية قبل فتح أي رابط.</div>
         </div>
-        <button id="btn-clear-history" class="btn-settings danger" data-i18n="settings.clearHistory">مسح السجل</button>
-      </div>
-    </div>
-
-    <!-- Security Settings -->
-    <div class="settings-section">
-      <div class="settings-section-title" data-i18n="settings.securitySettings">🛡️ إعدادات الأمان</div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label" data-i18n="settings.urlScanning">مسح الروابط</div>
-          <div class="setting-sub" data-i18n="settings.urlScanningSubtitle">فحص الروابط مع VirusTotal</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-url-scanning"/><span class="toggle-slider"></span></label>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label" data-i18n="settings.httpsWarning">تحذير HTTPS</div>
-          <div class="setting-sub" data-i18n="settings.httpsWarningSubtitle">التحذير من روابط HTTP</div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="toggle-https-warning"/><span class="toggle-slider"></span></label>
-      </div>
-    </div>
-
-    <!-- App Info -->
-    <div class="settings-section">
-      <div class="settings-section-title" data-i18n="settings.appInfo">ℹ️ معلومات التطبيق</div>
-      <div class="setting-row">
-        <div class="setting-label" data-i18n="settings.version">الإصدار</div>
-        <div class="setting-value" data-i18n="settings.versionNumber">BasiraQr v1.5.0 PWA</div>
-      </div>
-      <div class="setting-row" style="cursor:pointer" onclick="window.open('https://www.virustotal.com','_blank')">
-        <div>
-          <div class="setting-label" data-i18n="settings.aboutVT">حول VirusTotal</div>
-        </div>
-        <span style="color:var(--text-3)">›</span>
-      </div>
-    </div>
-
-    <div class="settings-footer" data-i18n="settings.madeWith">صُنع بـ ❤️ لمسح أكثر أماناً لرموز QR</div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       BOTTOM NAVIGATION
-  ══════════════════════════════════════ -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-screen="scanner">
-      <span class="nav-icon">📷</span>
-      <span class="nav-label" data-i18n="scanner.title">الماسح</span>
-    </button>
-    <button class="nav-btn" data-screen="history">
-      <span class="nav-icon">📋</span>
-      <span class="nav-label" data-i18n="settings.scanHistory">السجل</span>
-    </button>
-    <button class="nav-btn" data-screen="setup">
-      <span class="nav-icon">🔑</span>
-      <span class="nav-label" data-i18n="settings.apiKey">المفتاح</span>
-    </button>
-    <button class="nav-btn" data-screen="settings">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label" data-i18n="common.settings">الإعدادات</span>
-    </button>
-  </nav>
-
-  <!-- ══════════════════════════════════════
-       CHANGE API KEY MODAL (bottom sheet)
-  ══════════════════════════════════════ -->
-  <div id="change-key-modal" class="modal-sheet hidden">
-    <div class="modal-content">
-      <div class="modal-handle"></div>
-      <div class="modal-title" data-i18n="settings.changeApiKey">تغيير مفتاح API</div>
-      <div class="modal-sub" data-i18n="settings.enterNewKey">أدخل مفتاح VirusTotal API الجديد.</div>
-      <input id="new-key-input" class="form-input" type="password" style="width:100%;margin-bottom:8px" autocomplete="off" spellcheck="false"/>
-      <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" class="modal-link" data-i18n="settings.getKeyFree">ليس لديك مفتاح؟ احصل على واحد مجاناً</a>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="close-change-key" data-i18n="common.cancel">إلغاء</button>
-        <button class="btn-primary" id="save-key-btn" data-i18n="common.save">حفظ</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════
-       CONFIRM MODAL
-  ══════════════════════════════════════ -->
-  <div id="modal-overlay" class="hidden">
-    <div class="modal-box">
-      <div class="modal-title" id="modal-title"></div>
-      <div class="modal-message" id="modal-message"></div>
-      <div id="modal-buttons"></div>
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-label">المميزات</div>
+  <h2 class="section-title">كل ما تحتاجه لحماية نفسك</h2>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-body">
+        <div class="feature-title">تحليل بـ VirusTotal</div>
+        <div class="feature-desc">كل رابط يُحلَّل من خلال 92+ محرك أمان عالمي في ثوانٍ معدودة.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📷</div>
+      <div class="feature-body">
+        <div class="feature-title">مسح فوري بالكاميرا</div>
+        <div class="feature-desc">يعمل مباشرة في متصفحك على الموبايل والكمبيوتر بدون تثبيت.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-body">
+        <div class="feature-title">خصوصية تامة</div>
+        <div class="feature-desc">مفتاح API الخاص بك مُشفَّر على جهازك فقط ولا نراه أبداً.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌙</div>
+      <div class="feature-body">
+        <div class="feature-title">واجهة عربية متكاملة</div>
+        <div class="feature-desc">دعم كامل للعربية والإنجليزية مع وضع داكن ومشرق وألوان متعددة.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-body">
+        <div class="feature-title">تطبيق PWA قابل للتثبيت</div>
+        <div class="feature-desc">يمكن إضافته لشاشة الرئيسية ويعمل بدون إنترنت بعد أول استخدام.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-body">
+        <div class="feature-title">سجل المسح</div>
+        <div class="feature-desc">تتبع كل رمز QR مسحته وراجع نتائج الأمان في أي وقت.</div>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- ══════════════════════════════════════
-       TOAST CONTAINER
-  ══════════════════════════════════════ -->
-  <div id="toast-container"></div>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-card">
+    <div style="font-size:52px;margin-bottom:20px">🛡️</div>
+    <h2 class="cta-title">ابدأ الحماية الآن</h2>
+    <p class="cta-sub">مجاني 100% · لا تثبيت · لا حساب · فقط مفتاح VirusTotal المجاني</p>
+    <a class="btn-hero-primary" href="./app.html" style="display:inline-flex">
+      📷 افتح التطبيق
+    </a>
+  </div>
+</section>
 
-</div><!-- #app -->
+<!-- Footer -->
+<footer>
+  <p>صُنع بـ ❤️ · <a href="./app.html">التطبيق</a> · <a href="https://www.virustotal.com" target="_blank">VirusTotal</a></p>
+</footer>
 
-<!-- jsQR library -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-<!-- App modules (order matters) -->
-<script src="js/i18n.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/virustotal.js"></script>
-<script src="js/scanner.js"></script>
-<script src="js/app.js"></script>
 </body>
 </html>
