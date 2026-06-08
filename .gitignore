@@ -1,6 +1,10 @@
-# --- Node / JS package directories ---
+# --- Environment / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Node ---
 node_modules/
-landing-page/node_modules/
 
 # --- Package manager logs ---
 npm-debug.log*
@@ -10,20 +14,8 @@ pnpm-debug.log*
 
 # --- Build outputs ---
 build/
+dist/
 web-build/
-
-
-
-# --- Expo / React Native caches ---
-.expo/
-.expo-shared/
-.metro-cache/
-
-# --- Platform specific (if using prebuild) ---
-android/
-ios/
-# Keep CocoaPods cache out even if iOS is committed later
-ios/Pods/
 
 # --- Caches / tooling ---
 .cache/
@@ -32,14 +24,9 @@ ios/Pods/
 .vite/
 .eslintcache
 
-# --- Coverage ---
+# --- Coverage / test output ---
 coverage/
 .nyc_output/
-
-# --- Environment / secrets ---
-.env
-.env.*
-!.env.example
 
 # --- Editor / IDE ---
 .vscode/
@@ -59,6 +46,3 @@ desktop.ini
 .temp/
 logs/
 *.orig
-
-# --- Landing page specific ---
-landing-page/.vite/

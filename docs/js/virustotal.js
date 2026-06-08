@@ -22,9 +22,8 @@ const VirusTotalService = {
   },
 
   async validateApiKey(key) {
-    // We only want to reject on an explicit 401 Unauthorized.
-    // Any network / CORS error means we can't reach VT to check,
-    // so we accept the key and let the first real scan confirm it.
+    // Returns { valid: boolean, skipped: boolean }
+    // skipped=true means we couldn't reach VT (network/timeout) — caller should warn the user.
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 12000);
@@ -35,11 +34,11 @@ const VirusTotalService = {
         signal: controller.signal,
       });
       clearTimeout(timer);
-      // 401 = bad key, anything else (200, 404, 429…) = key is fine
-      return res.status !== 401;
+      // 401 = explicitly rejected key (bad key), anything else = key accepted by VT
+      return { valid: res.status !== 401, skipped: false };
     } catch {
-      // Network error, CORS block, or timeout — assume key is valid
-      return true;
+      // Network error, CORS block, or timeout — can't verify; accept and warn caller
+      return { valid: true, skipped: true };
     }
   },
 
@@ -58,7 +57,7 @@ const VirusTotalService = {
     const analysisId = submitData.data.id;
 
     // 2. Poll analysis with progressive delay
-    const delays = [3000, 5000, 8000, 10000];
+    const delays = [1500, 3000, 5000, 8000]; // reduced: VT often has cached results within 1-2s
     const delay = delays[retryCount] || 10000;
     await new Promise(r => setTimeout(r, delay));
 

@@ -88,14 +88,19 @@ const App = {
       btn.textContent = i18n.t('settings.validating');
 
       VirusTotalService.setApiKey(key);
-      const valid = await VirusTotalService.validateApiKey(key);
+      const { valid, skipped } = await VirusTotalService.validateApiKey(key);
 
       if (valid) {
         Storage.storeApiKey(key);
         this.state.apiKey = key;
-        this.showToast(i18n.t('errors.apiKeyUpdated'), 'success');
+        if (skipped) {
+          this.showToast(i18n.t('errors.apiKeyUnverified'), 'warning');
+        } else {
+          this.showToast(i18n.t('errors.apiKeyUpdated'), 'success');
+        }
         setTimeout(() => { this.showScreen('scanner'); this.startScanner(); }, 800);
-      } else {        this.showToast(i18n.t('errors.invalidApiKeyMessage'), 'error');
+      } else {
+        this.showToast(i18n.t('errors.invalidApiKeyMessage'), 'error');
       }
 
       btn.disabled = false;
@@ -423,14 +428,18 @@ const App = {
     btn.disabled = true;
     btn.textContent = i18n.t('settings.validating');
     VirusTotalService.setApiKey(key);
-    const valid = await VirusTotalService.validateApiKey(key);
+    const { valid, skipped } = await VirusTotalService.validateApiKey(key);
 
     if (valid) {
       Storage.storeApiKey(key);
       this.state.apiKey = key;
       this.closeChangeKeyModal();
       this.renderSettings();
-      this.showToast(i18n.t('errors.apiKeyUpdated'), 'success');
+      if (skipped) {
+        this.showToast(i18n.t('errors.apiKeyUnverified'), 'warning');
+      } else {
+        this.showToast(i18n.t('errors.apiKeyUpdated'), 'success');
+      }
     } else {
       this.showToast(i18n.t('errors.invalidApiKeyMessage'), 'error');
     }

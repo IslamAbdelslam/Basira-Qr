@@ -1,4 +1,4 @@
-const CACHE_NAME = 'basira-qr-v6';
+const CACHE_NAME = 'basira-qr-v7'; // bumped: self-hosted jsQR, perf improvements
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -11,18 +11,17 @@ const STATIC_ASSETS = [
   './js/theme.js',
   './js/app.js',
   './js/pwa-install.js',
+  './js/jsqr.min.js',   // self-hosted — no CDN dependency
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js'
 ];
 
 // Install: cache all static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS.filter(url => !url.startsWith('http') || url.includes('jsqr')));
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+              .then(() => self.skipWaiting())
   );
 });
 
@@ -37,17 +36,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: cache-first for static, network-first for API
+// Fetch: cache-first for static, pass-through for all API calls
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Don't cache VirusTotal API calls
-  if (url.hostname.includes('virustotal.com')) {
+  // Never cache: VirusTotal API or the Cloudflare Worker proxy
+  if (url.hostname.includes('virustotal.com') ||
+      url.hostname.includes('workers.dev')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // Cache-first strategy
+  // Cache-first strategy for all static assets
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
@@ -58,9 +58,9 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       }).catch(() => {
-        // Fallback to index.html for navigation requests
+        // Fallback to app shell for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('./app.html') || caches.match('./index.html');
         }
       });
     })

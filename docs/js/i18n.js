@@ -82,7 +82,9 @@ const translations = {
       suspiciousUrlMessage:'This URL has some flags. Proceed with caution.',
       openCarefully:'Open Carefully', enterValidKey:'Please enter a valid API key',
       corsError:'CORS blocked. VirusTotal cannot be called directly from some browsers.',
-      cameraNotSupported:'Camera not supported. Please use Chrome or Safari on a device with a camera.'
+      cameraNotSupported:'Camera not supported. Please use Chrome or Safari on a device with a camera.',
+      apiKeyUnverified:'Network unavailable — key saved, but your first scan will confirm it.',
+      successMessage:'Done!'
     }
   },
   ar: {
@@ -164,7 +166,9 @@ const translations = {
       suspiciousUrlMessage:'تم الإشارة إلى هذا الرابط من قبل بعض جهات الأمان.',
       openCarefully:'افتح بحذر', enterValidKey:'يرجى إدخال مفتاح API صالح',
       corsError:'تعذر الاتصال بـ VirusTotal مباشرة من المتصفح.',
-      cameraNotSupported:'الكاميرا غير مدعومة. يرجى استخدام Chrome أو Safari.'
+      cameraNotSupported:'الكاميرا غير مدعومة. يرجى استخدام Chrome أو Safari.',
+      apiKeyUnverified:'الشبكة غير متاحة — تم حفظ المفتاح، وسيتم التأكيد عند أول فحص.',
+      successMessage:'تم!'
     }
   }
 };
