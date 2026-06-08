@@ -39,7 +39,7 @@
 
 /* ── Reset & Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { height: 100%; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 body {
   font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
   background: var(--bg);
@@ -52,7 +52,7 @@ body {
 [dir="rtl"] { font-family: 'Noto Sans Arabic', 'Inter', sans-serif; }
 
 /* ── App Shell ── */
-#app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; }
+#app { display: flex; flex-direction: column; height: 100dvh; width: 100%; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; }
 
 /* ── Screens ── */
 .screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; }
@@ -61,16 +61,18 @@ body {
 /* ── Bottom Nav ── */
 .bottom-nav {
   display: flex; align-items: center; background: var(--bg-card);
-  border-top: 1px solid var(--border); padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  padding: 4px 0 max(8px, env(safe-area-inset-bottom));
   flex-shrink: 0; z-index: 10;
 }
 .nav-btn {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  background: none; border: none; cursor: pointer; padding: 6px 4px;
+  background: none; border: none; cursor: pointer; padding: 8px 4px;
   color: var(--text-3); transition: color var(--transition);
+  min-height: 56px; /* phone touch target */
 }
-.nav-btn .nav-icon { font-size: 22px; line-height: 1; }
-.nav-btn .nav-label { font-size: 10px; font-weight: 500; letter-spacing: .3px; }
+.nav-btn .nav-icon { font-size: 24px; line-height: 1; }
+.nav-btn .nav-label { font-size: 11px; font-weight: 600; letter-spacing: .3px; }
 .nav-btn.active { color: var(--color-primary); }
 .nav-btn.active .nav-icon { transform: translateY(-1px); }
 
@@ -145,12 +147,12 @@ body {
 }
 @keyframes scan { 0%{top:4px;opacity:1} 90%{top:calc(100% - 4px);opacity:1} 100%{top:calc(100% - 4px);opacity:0} }
 .scanner-settings-btn {
-  position: absolute; top: 0; right: 0; pointer-events: all;
-  background: rgba(0,0,0,.5); border: none; border-radius: 50%;
-  width: 48px; height: 48px; font-size: 22px; cursor: pointer;
-  backdrop-filter: blur(4px); color: #fff;
+  position: absolute; top: max(12px, env(safe-area-inset-top)); right: 12px; pointer-events: all;
+  background: rgba(0,0,0,.55); border: none; border-radius: 50%;
+  width: 52px; height: 52px; font-size: 24px; cursor: pointer;
+  backdrop-filter: blur(4px); color: #fff; display: flex; align-items: center; justify-content: center;
 }
-[dir="rtl"] .scanner-settings-btn { right: auto; left: 0; }
+[dir="rtl"] .scanner-settings-btn { right: auto; left: 12px; }
 .scanner-bottom {
   padding: 20px; background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
   pointer-events: all;
@@ -368,8 +370,16 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* ── Desktop centering ── */
+/* ── Desktop layout only ── */
 @media (min-width: 520px) {
   #app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); box-shadow: var(--shadow-lg); }
   body { display: flex; justify-content: center; background: var(--bg-surf); }
+}
+/* ── Phone tweaks ── */
+@media (max-width: 519px) {
+  .setup-card { padding: 16px; }
+  .card { padding: 16px; }
+  .btn-primary, .btn-action { padding: 16px; font-size: 16px; }
+  .result-title { font-size: 20px; }
+  .scan-frame { width: 220px; height: 220px; }
 }
