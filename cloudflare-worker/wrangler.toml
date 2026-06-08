@@ -1,6 +1,6 @@
-name = "basira-vt-proxy"
+name = "bsira-proxy"
 main = "worker.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2026-06-08"
 
 # No secrets or environment variables needed.
 # The user's VirusTotal API key is forwarded from the browser request.

@@ -4,7 +4,7 @@
 
 const VirusTotalService = {
   // Cloudflare Worker proxy — eliminates CORS, user's x-apikey is passed through transparently.
-  baseUrl: 'https://basira-vt-proxy.islamabdoulradi.workers.dev/api/v3',
+  baseUrl: 'https://bsira-proxy.islamabdoulradi.workers.dev/api/v3',
   apiKey: null,
 
   setApiKey(key) { this.apiKey = key; },
