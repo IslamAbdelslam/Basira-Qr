@@ -1,4 +1,4 @@
-const CACHE_NAME = 'basira-qr-v5';
+const CACHE_NAME = 'basira-qr-v6';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   './js/scanner.js',
   './js/theme.js',
   './js/app.js',
+  './js/pwa-install.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
