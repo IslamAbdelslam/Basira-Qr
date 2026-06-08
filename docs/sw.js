@@ -1,4 +1,4 @@
-const CACHE_NAME = 'basira-qr-v7'; // bumped: self-hosted jsQR, perf improvements
+const CACHE_NAME = 'basira-qr-v8'; // v8: zero-tolerance security + nav bar fix + phishing labels
 const STATIC_ASSETS = [
   './',
   './index.html',
