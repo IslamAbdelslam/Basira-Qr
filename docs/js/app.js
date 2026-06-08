@@ -14,57 +14,57 @@ const App = {
 
   // ── Bootstrap ─────────────────────────────
   init() {
-    // Load locale
     const savedLocale = Storage.getLocale() || 'ar';
     i18n.setLocale(savedLocale);
-
-    // Load theme
     Theme.init();
-
-    // Load persisted state
     this.state.apiKey = Storage.getApiKey();
     const saved = Storage.getSettings();
     if (Object.keys(saved).length) Object.assign(this.state.settings, saved);
     this.state.scanHistory = Storage.getScanHistory();
-
-    // Network monitoring
     window.addEventListener('online',  () => { this.state.isOnline = true;  this._updateNetworkBanner(); });
     window.addEventListener('offline', () => { this.state.isOnline = false; this._updateNetworkBanner(); });
-
-    // Register Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
-
-    // Navigate to correct initial screen
+    // Always start on scanner; if no key, also go to key tab
     if (this.state.apiKey) {
       this.showScreen('scanner');
       this.startScanner();
     } else {
-      this.showScreen('setup');
+      this.showScreen('setup');  // key tab
     }
-
     this.renderSettings();
+    this._updateHistoryBadge();
   },
 
   // ── Router ────────────────────────────────
   showScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(`screen-${name}`)?.classList.add('active');
-
-    // Bottom nav highlight
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.nav-btn[data-screen="${name}"]`)?.classList.add('active');
-
-    // Stop scanner when leaving scanner screen
     if (name !== 'scanner' && this.state.scannerRunning) {
       Scanner.stop();
       this.state.scannerRunning = false;
     }
-
-    // Refresh settings UI when entering settings
     if (name === 'settings') this.renderSettings();
-    if (name === 'history') this.renderHistory();
+    if (name === 'history')  this.renderHistory();
+    if (name === 'setup')    this.renderSetupTab();
+  },
+
+  renderSetupTab() {
+    // Update key display inside setup tab
+    const el = document.getElementById('setup-tab-current-key');
+    if (el) el.textContent = this.state.apiKey ? `••••${this.state.apiKey.slice(-6)}` : '';
+    const changeSection = document.getElementById('setup-tab-change');
+    const welcomeSection = document.getElementById('setup-tab-welcome');
+    if (this.state.apiKey) {
+      changeSection?.classList.remove('hidden');
+      welcomeSection?.classList.add('hidden');
+    } else {
+      changeSection?.classList.add('hidden');
+      welcomeSection?.classList.remove('hidden');
+    }
   },
 
   // ── Setup Screen ──────────────────────────
@@ -95,8 +95,7 @@ const App = {
         this.state.apiKey = key;
         this.showToast(i18n.t('errors.apiKeyUpdated'), 'success');
         setTimeout(() => { this.showScreen('scanner'); this.startScanner(); }, 800);
-      } else {
-        this.showToast(i18n.t('errors.invalidApiKeyMessage'), 'error');
+      } else {        this.showToast(i18n.t('errors.invalidApiKeyMessage'), 'error');
       }
 
       btn.disabled = false;

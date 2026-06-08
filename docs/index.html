@@ -22,25 +22,46 @@
        SETUP SCREEN
   ══════════════════════════════════════ -->
   <div id="screen-setup" class="screen">
-    <div class="setup-logo">🛡️</div>
-    <h1 class="setup-title" data-i18n="setup.welcome">مرحباً بك في بصيرة كيو آر</h1>
-    <p class="setup-sub" data-i18n="setup.protect">احمِ نفسك من رموز الاستجابة السريعة الخبيثة</p>
 
-    <div class="card setup-card">
-      <form id="setup-form">
-        <label class="form-label" for="api-key-input" data-i18n="setup.enterKey">أدخل مفتاح API:</label>
-        <div class="input-wrap">
-          <input id="api-key-input" class="form-input" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••••••••••••••"/>
-          <button type="button" id="toggle-key-visibility" class="icon-btn" aria-label="Toggle visibility">👁️</button>
+    <!-- State A: No key yet (welcome) -->
+    <div id="setup-tab-welcome" style="display:flex;flex-direction:column;align-items:center;padding:32px 20px;flex:1">
+      <div class="setup-logo">🛡️</div>
+      <h1 class="setup-title" data-i18n="setup.welcome">مرحباً بك في بصيرة كيو آر</h1>
+      <p class="setup-sub" data-i18n="setup.protect">احمِ نفسك من رموز الاستجابة السريعة الخبيثة</p>
+      <div class="card setup-card">
+        <form id="setup-form">
+          <label class="form-label" for="api-key-input" data-i18n="setup.enterKey">أدخل مفتاح API:</label>
+          <div class="input-wrap">
+            <input id="api-key-input" class="form-input" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••••••••••••••"/>
+            <button type="button" id="toggle-key-visibility" class="icon-btn" aria-label="Toggle visibility">👁️</button>
+          </div>
+          <button type="submit" id="validate-btn" class="btn-primary" data-i18n="setup.validateContinue">تحقق ثم تابع</button>
+        </form>
+        <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" class="setup-link" data-i18n="setup.getKey">الحصول على مفتاح API مجاناً</a>
+        <div class="privacy-box">
+          <div class="privacy-title" data-i18n="setup.privacyTitle">إشعار الخصوصية</div>
+          <div class="privacy-text" data-i18n="setup.privacy">يُخزَّن مفتاح API الخاص بك بشكل آمن على جهازك فقط.</div>
         </div>
-        <button type="submit" id="validate-btn" class="btn-primary" data-i18n="setup.validateContinue">تحقق ثم تابع</button>
-      </form>
-      <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" class="setup-link" data-i18n="setup.getKey">الحصول على مفتاح API مجاناً</a>
-      <div class="privacy-box">
+      </div>
+    </div>
+
+    <!-- State B: Key already set (manage) -->
+    <div id="setup-tab-change" class="hidden" style="padding:24px 16px">
+      <div class="screen-header" data-i18n="settings.apiKey">مفتاح API</div>
+      <div class="card">
+        <div class="setting-label" data-i18n="settings.currentKey" style="margin-bottom:6px">المفتاح الحالي:</div>
+        <div id="setup-tab-current-key" class="setting-value" style="font-family:monospace;font-size:15px;margin-bottom:16px"></div>
+        <div class="action-buttons">
+          <button class="btn-primary" onclick="App.openChangeApiKey()" data-i18n="settings.changeApiKey">تغيير مفتاح API</button>
+          <button class="btn-outline" style="color:var(--color-danger);border-color:var(--color-danger)" onclick="App.removeApiKey()" data-i18n="settings.removeKey">إزالة مفتاح API</button>
+        </div>
+      </div>
+      <div class="privacy-box" style="margin-top:0">
         <div class="privacy-title" data-i18n="setup.privacyTitle">إشعار الخصوصية</div>
         <div class="privacy-text" data-i18n="setup.privacy">يُخزَّن مفتاح API الخاص بك بشكل آمن على جهازك فقط.</div>
       </div>
     </div>
+
   </div>
 
   <!-- ══════════════════════════════════════
@@ -272,6 +293,10 @@
     <button class="nav-btn" data-screen="history">
       <span class="nav-icon">📋</span>
       <span class="nav-label" data-i18n="settings.scanHistory">السجل</span>
+    </button>
+    <button class="nav-btn" data-screen="setup">
+      <span class="nav-icon">🔑</span>
+      <span class="nav-label" data-i18n="settings.apiKey">المفتاح</span>
     </button>
     <button class="nav-btn" data-screen="settings">
       <span class="nav-icon">⚙️</span>
