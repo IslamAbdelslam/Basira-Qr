@@ -33,6 +33,7 @@ const App = {
     } else {
       this.showScreen('setup');  // key tab
     }
+    this._updateBottomNavVisibility();
     this.renderSettings();
     this._updateHistoryBadge();
   },
@@ -93,6 +94,7 @@ const App = {
       if (valid) {
         Storage.storeApiKey(key);
         this.state.apiKey = key;
+        this._updateBottomNavVisibility();
         if (skipped) {
           this.showToast(i18n.t('errors.apiKeyUnverified'), 'warning');
         } else {
@@ -220,6 +222,13 @@ const App = {
   _updateHistoryBadge() {
     const badge = document.getElementById('history-badge');
     if (badge) badge.textContent = this.state.scanHistory.length;
+  },
+
+  _updateBottomNavVisibility() {
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav) {
+      bottomNav.classList.toggle('hidden', !this.state.apiKey);
+    }
   },
 
   // ── Results Screen ────────────────────────
@@ -385,6 +394,7 @@ const App = {
        { label: i18n.t('settings.removeKey'), danger: true, action: () => {
            Storage.removeApiKey();
            this.state.apiKey = null;
+           this._updateBottomNavVisibility();
            Scanner.stop();
            this.state.scannerRunning = false;
            this.showScreen('setup');
@@ -433,6 +443,7 @@ const App = {
     if (valid) {
       Storage.storeApiKey(key);
       this.state.apiKey = key;
+      this._updateBottomNavVisibility();
       this.closeChangeKeyModal();
       this.renderSettings();
       if (skipped) {
