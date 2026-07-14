@@ -68,18 +68,34 @@
   const banner = document.createElement('div');
   banner.id = 'pwa-banner';
   banner.setAttribute('role', 'alert');
-  banner.setAttribute('dir', 'rtl');
-  banner.innerHTML = `
-    <div id="pwa-banner-icon">🛡️</div>
-    <div id="pwa-banner-body">
-      <div id="pwa-banner-title">ثبّت بصيرة كيو آر</div>
-      <div id="pwa-banner-sub">أضفه لشاشتك الرئيسية للوصول السريع بدون متصفح</div>
-    </div>
-    <div id="pwa-banner-actions">
-      <button id="pwa-install-btn">تثبيت</button>
-      <button id="pwa-dismiss-btn" aria-label="إغلاق">✕</button>
-    </div>
-  `;
+
+  const isEn = document.documentElement.lang === 'en';
+  banner.setAttribute('dir', isEn ? 'ltr' : 'rtl');
+  if (isEn) {
+    banner.innerHTML = `
+      <div id="pwa-banner-icon">🛡️</div>
+      <div id="pwa-banner-body">
+        <div id="pwa-banner-title">Install Basira QR</div>
+        <div id="pwa-banner-sub">Add it to your home screen for quick access without a browser</div>
+      </div>
+      <div id="pwa-banner-actions">
+        <button id="pwa-install-btn">Install</button>
+        <button id="pwa-dismiss-btn" aria-label="Dismiss">✕</button>
+      </div>
+    `;
+  } else {
+    banner.innerHTML = `
+      <div id="pwa-banner-icon">🛡️</div>
+      <div id="pwa-banner-body">
+        <div id="pwa-banner-title">ثبّت بصيرة كيو آر</div>
+        <div id="pwa-banner-sub">أضفه لشاشتك الرئيسية للوصول السريع بدون متصفح</div>
+      </div>
+      <div id="pwa-banner-actions">
+        <button id="pwa-install-btn">تثبيت</button>
+        <button id="pwa-dismiss-btn" aria-label="إغلاق">✕</button>
+      </div>
+    `;
+  }
 
   function showBanner() {
     if (!document.body.contains(banner)) document.body.appendChild(banner);
@@ -136,8 +152,9 @@
         #pwa-install-btn { display: none; }
       `;
       document.head.appendChild(style2);
-      banner.querySelector('#pwa-banner-sub').textContent =
-        'اضغط على 🔗 Share ثم "Add to Home Screen" لتثبيت التطبيق';
+      banner.querySelector('#pwa-banner-sub').textContent = isEn
+        ? 'Tap the Share icon 🔗 then "Add to Home Screen" to install the app'
+        : 'اضغط على 🔗 Share ثم "Add to Home Screen" لتثبيت التطبيق';
       showBanner();
     }, 2000);
   }

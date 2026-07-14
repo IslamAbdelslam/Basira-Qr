@@ -1,7 +1,8 @@
-const CACHE_NAME = 'basira-qr-v8'; // v8: zero-tolerance security + nav bar fix + phishing labels
+const CACHE_NAME = 'basira-qr-v9'; // v9: multi-language support (Arabic & English)
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './index.en.html',
   './app.html',
   './css/style.css',
   './js/i18n.js',

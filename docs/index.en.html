@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <script>
     (function() {
       const savedLocale = localStorage.getItem('basira_locale');
       const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-      if (savedLocale === 'en' || (!savedLocale && !browserLang.startsWith('ar'))) {
-        window.location.replace('./index.en.html' + window.location.search + window.location.hash);
+      if (savedLocale === 'ar' || (!savedLocale && browserLang.startsWith('ar'))) {
+        window.location.replace('./index.html' + window.location.search + window.location.hash);
       }
     })();
   </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>بصيرة كيو آر – ماسح QR آمن</title>
-  <meta name="description" content="امسح رموز QR بأمان وثقة. بصيرة كيو آر يحللها بـ VirusTotal قبل أن تفتحها."/>
+  <title>Basira QR – Secure QR Scanner</title>
+  <meta name="description" content="Scan QR codes safely and confidently. Basira QR analyzes them with VirusTotal before you open them."/>
   <meta name="theme-color" content="#6366F1"/>
   <link rel="manifest" href="manifest.json"/>
   <link rel="icon" href="icons/icon-192.png"/>
@@ -40,7 +40,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Tajawal', 'Inter', sans-serif;
+      font-family: 'Inter', 'Tajawal', sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -314,31 +314,31 @@
 
 <!-- Nav -->
 <nav>
-  <a class="nav-logo" href="./index.html">
+  <a class="nav-logo" href="./index.en.html">
     <span class="nav-logo-icon">🛡️</span>
-    <span class="nav-logo-text">بصيرة كيو آر</span>
+    <span class="nav-logo-text">Basira QR</span>
   </a>
   <div style="display: flex; align-items: center; gap: 16px;">
-    <a href="./index.en.html" class="lang-switch" onclick="localStorage.setItem('basira_locale', 'en')" style="color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 600;">English</a>
-    <a class="nav-cta" href="./app.html">جرّب التطبيق مجاناً ←</a>
+    <a href="./index.html" class="lang-switch" onclick="localStorage.setItem('basira_locale', 'ar')" style="color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 600;">العربية</a>
+    <a class="nav-cta" href="./app.html">Try App for Free →</a>
   </div>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-badge">✨ مدعوم بـ VirusTotal</div>
+  <div class="hero-badge">✨ Powered by VirusTotal</div>
   <div class="hero-icon">🛡️</div>
-  <h1 class="hero-title">امسح رموز QR<br/>بأمان وثقة تامة</h1>
+  <h1 class="hero-title">Scan QR codes<br/>with total safety & confidence</h1>
   <p class="hero-sub">
-    بصيرة كيو آر يحلل كل رمز QR تمسحه عبر 90+ جهة أمان عالمية قبل أن تفتح أي رابط.
-    احمِ نفسك من المواقع الخبيثة والتصيد الاحتيالي.
+    Basira QR analyzes every QR code you scan using 90+ global security engines before you open any link.
+    Protect yourself from malware and phishing attacks.
   </p>
   <div class="hero-actions">
     <a class="btn-hero-primary" href="./app.html">
-      📷 جرّب التطبيق الآن
+      📷 Try the App Now
     </a>
     <a class="btn-hero-secondary" href="#features">
-      اعرف أكثر ↓
+      Learn More ↓
     </a>
   </div>
 </section>
@@ -347,19 +347,19 @@
 <div class="stats">
   <div class="stat">
     <div class="stat-value">92+</div>
-    <div class="stat-label">جهة أمان عالمية</div>
+    <div class="stat-label">Global Security Engines</div>
   </div>
   <div class="stat">
-    <div class="stat-value">مجاني</div>
-    <div class="stat-label">100% مجاني تماماً</div>
+    <div class="stat-value">Free</div>
+    <div class="stat-label">100% completely free</div>
   </div>
   <div class="stat">
-    <div class="stat-value">ثوانٍ</div>
-    <div class="stat-label">وقت التحليل</div>
+    <div class="stat-value">Seconds</div>
+    <div class="stat-label">Analysis Time</div>
   </div>
   <div class="stat">
-    <div class="stat-value">خاص</div>
-    <div class="stat-label">مفتاحك على جهازك فقط</div>
+    <div class="stat-value">Private</div>
+    <div class="stat-label">Key on your device only</div>
   </div>
 </div>
 
@@ -372,43 +372,43 @@
           <div class="phone-cam-line"></div>
         </div>
         <div class="phone-result">
-          <div class="phone-result-badge">✅ آمن للزيارة</div>
+          <div class="phone-result-badge">✅ Safe to Visit</div>
           <div class="phone-result-url">https://www.example.com</div>
-          <div class="phone-score">0 / 92 جهة أمان أشارت إليه</div>
+          <div class="phone-score">0 / 92 security vendors flagged it</div>
         </div>
         <div class="phone-nav">
-          <div class="phone-nav-btn active">📷<span>الماسح</span></div>
-          <div class="phone-nav-btn">📋<span>السجل</span></div>
-          <div class="phone-nav-btn">🔑<span>المفتاح</span></div>
-          <div class="phone-nav-btn">⚙️<span>الإعدادات</span></div>
+          <div class="phone-nav-btn active">📷<span>Scanner</span></div>
+          <div class="phone-nav-btn">📋<span>History</span></div>
+          <div class="phone-nav-btn">🔑<span>Key</span></div>
+          <div class="phone-nav-btn">⚙️<span>Settings</span></div>
         </div>
       </div>
     </div>
   </div>
 
   <div style="max-width:380px">
-    <div class="section-label">كيف يعمل؟</div>
-    <h2 class="section-title" style="text-align:right;margin-bottom:28px">3 خطوات فقط</h2>
+    <div class="section-label">How it works?</div>
+    <h2 class="section-title" style="text-align:left;margin-bottom:28px">Just 3 Steps</h2>
     <div style="display:flex;flex-direction:column;gap:20px">
       <div style="display:flex;gap:16px;align-items:flex-start">
         <div class="step-num" style="flex-shrink:0">1</div>
         <div>
-          <div class="step-title">أضف مفتاح VirusTotal</div>
-          <div class="step-desc">مجاني تماماً، يُخزَّن على جهازك فقط ولا يُرسَل لأحد.</div>
+          <div class="step-title">Add VirusTotal Key</div>
+          <div class="step-desc">Completely free, stored only on your device, and never shared with anyone.</div>
         </div>
       </div>
       <div style="display:flex;gap:16px;align-items:flex-start">
         <div class="step-num" style="flex-shrink:0">2</div>
         <div>
-          <div class="step-title">وجّه الكاميرا نحو رمز QR</div>
-          <div class="step-desc">الكاميرا تعمل مباشرة في المتصفح بدون تطبيق منفصل.</div>
+          <div class="step-title">Point Camera at QR Code</div>
+          <div class="step-desc">The camera works directly inside the browser without requiring a separate app.</div>
         </div>
       </div>
       <div style="display:flex;gap:16px;align-items:flex-start">
         <div class="step-num" style="flex-shrink:0">3</div>
         <div>
-          <div class="step-title">شاهد تقرير الأمان فوراً</div>
-          <div class="step-desc">تحليل فوري من 92+ جهة أمان عالمية قبل فتح أي رابط.</div>
+          <div class="step-title">See Security Report Instantly</div>
+          <div class="step-desc">Instant check through 92+ security vendors before opening any link.</div>
         </div>
       </div>
     </div>
@@ -417,49 +417,49 @@
 
 <!-- Features -->
 <section class="section" id="features">
-  <div class="section-label">المميزات</div>
-  <h2 class="section-title">كل ما تحتاجه لحماية نفسك</h2>
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need to protect yourself</h2>
   <div class="features">
     <div class="feature-card">
       <div class="feature-icon">🛡️</div>
       <div class="feature-body">
-        <div class="feature-title">تحليل بـ VirusTotal</div>
-        <div class="feature-desc">كل رابط يُحلَّل من خلال 92+ محرك أمان عالمي في ثوانٍ معدودة.</div>
+        <div class="feature-title">VirusTotal Analysis</div>
+        <div class="feature-desc">Every URL is analyzed by 92+ antivirus engines and site scanners in seconds.</div>
       </div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📷</div>
       <div class="feature-body">
-        <div class="feature-title">مسح فوري بالكاميرا</div>
-        <div class="feature-desc">يعمل مباشرة في متصفحك على الموبايل والكمبيوتر بدون تثبيت.</div>
+        <div class="feature-title">Instant Camera Scanning</div>
+        <div class="feature-desc">Works directly in your browser on both mobile and desktop without installation.</div>
       </div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🔒</div>
       <div class="feature-body">
-        <div class="feature-title">خصوصية تامة</div>
-        <div class="feature-desc">مفتاح API الخاص بك مُشفَّر على جهازك فقط ولا نراه أبداً.</div>
+        <div class="feature-title">Complete Privacy</div>
+        <div class="feature-desc">Your API key is saved locally on your device and is never sent to our servers.</div>
       </div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🌙</div>
       <div class="feature-body">
-        <div class="feature-title">واجهة عربية متكاملة</div>
-        <div class="feature-desc">دعم كامل للعربية والإنجليزية مع وضع داكن ومشرق وألوان متعددة.</div>
+        <div class="feature-title">Dynamic Bi-lingual UI</div>
+        <div class="feature-desc">Full support for English and Arabic, including dark/light modes and theme accents.</div>
       </div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📱</div>
       <div class="feature-body">
-        <div class="feature-title">تطبيق PWA قابل للتثبيت</div>
-        <div class="feature-desc">يمكن إضافته لشاشة الرئيسية ويعمل بدون إنترنت بعد أول استخدام.</div>
+        <div class="feature-title">Installable PWA App</div>
+        <div class="feature-desc">Can be added to your home screen and operates offline after first use.</div>
       </div>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📊</div>
       <div class="feature-body">
-        <div class="feature-title">سجل المسح</div>
-        <div class="feature-desc">تتبع كل رمز QR مسحته وراجع نتائج الأمان في أي وقت.</div>
+        <div class="feature-title">Scan History</div>
+        <div class="feature-desc">Track all QR codes you have scanned and review security results whenever you want.</div>
       </div>
     </div>
   </div>
@@ -469,17 +469,17 @@
 <section class="cta-section">
   <div class="cta-card">
     <div style="font-size:52px;margin-bottom:20px">🛡️</div>
-    <h2 class="cta-title">ابدأ الحماية الآن</h2>
-    <p class="cta-sub">مجاني 100% · لا تثبيت · لا حساب · فقط مفتاح VirusTotal المجاني</p>
+    <h2 class="cta-title">Start Protection Now</h2>
+    <p class="cta-sub">100% Free · No Install · No Account Required · Just your free VirusTotal Key</p>
     <a class="btn-hero-primary" href="./app.html" style="display:inline-flex">
-      📷 افتح التطبيق
+      📷 Open the App
     </a>
   </div>
 </section>
 
 <!-- Footer -->
 <footer>
-  <p>صُنع بـ ❤️ · <a href="./app.html">التطبيق</a> · <a href="https://www.virustotal.com" target="_blank">VirusTotal</a></p>
+  <p>Made with ❤️ · <a href="./app.html">App</a> · <a href="https://www.virustotal.com" target="_blank">VirusTotal</a></p>
 </footer>
 
 <script src="./js/pwa-install.js"></script>

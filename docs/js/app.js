@@ -14,7 +14,11 @@ const App = {
 
   // ── Bootstrap ─────────────────────────────
   init() {
-    const savedLocale = Storage.getLocale() || 'ar';
+    let savedLocale = Storage.getLocale();
+    if (!savedLocale) {
+      const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      savedLocale = browserLang.startsWith('ar') ? 'ar' : 'en';
+    }
     i18n.setLocale(savedLocale);
     Theme.init();
     this.state.apiKey = Storage.getApiKey();
